@@ -1,16 +1,14 @@
-package iota.participationPlugin;
+package iota.participationPlugin.DOs.singleEvent;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
-public class DataDO implements Serializable {
+public class SingleEventDataDO implements Serializable {
     public String name;
     public int milestoneIndexCommence;
     public int milestoneIndexStart;
     public int milestoneIndexEnd;
-    public PayloadDO payload;
+    public SingleEventPayloadDO payload;
     public String additionalInfo;
-    public ArrayList<String> eventIds;
 
     public String getName() {
         return name;
@@ -44,11 +42,11 @@ public class DataDO implements Serializable {
         this.milestoneIndexEnd = milestoneIndexEnd;
     }
 
-    public PayloadDO getPayload() {
+    public SingleEventPayloadDO getPayload() {
         return payload;
     }
 
-    public void setPayload(PayloadDO payload) {
+    public void setPayload(SingleEventPayloadDO payload) {
         this.payload = payload;
     }
 
@@ -60,11 +58,4 @@ public class DataDO implements Serializable {
         this.additionalInfo = additionalInfo;
     }
 
-    public ArrayList<String> getEventIds() {
-        return eventIds;
-    }
-
-    public void setEventIds(ArrayList<String> eventIds) {
-        this.eventIds = eventIds;
-    }
 }

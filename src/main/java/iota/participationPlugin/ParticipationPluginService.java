@@ -1,5 +1,8 @@
 package iota.participationPlugin;
 
+import iota.participationPlugin.DOs.eventStatus.EventStatusParticipationPluginDO;
+import iota.participationPlugin.DOs.events.EventsParticipationPluginDO;
+import iota.participationPlugin.DOs.singleEvent.SingleEventParticipationPluginDO;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 import javax.inject.Singleton;
@@ -16,10 +19,15 @@ public interface ParticipationPluginService {
     @GET
     @Path("/events")
     @Produces("application/json")
-    ParticipationPluginDO getParticipationEvents();
+    EventsParticipationPluginDO getParticipationEvents();
 
     @GET
     @Path("/events/{eventID}")
     @Produces("application/json")
-    ParticipationPluginDO getParticipationEvent(@PathParam("eventID") String eventID);
+    SingleEventParticipationPluginDO getParticipationEvent(@PathParam("eventID") String eventID);
+
+    @GET
+    @Path("/events/{eventID}/status")
+    @Produces("application/json")
+    EventStatusParticipationPluginDO getParticipationEventStatus(@PathParam("eventID") String eventID);
 }

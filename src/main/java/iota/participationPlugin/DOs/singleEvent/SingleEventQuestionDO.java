@@ -1,11 +1,11 @@
-package iota.participationPlugin;
+package iota.participationPlugin.DOs.singleEvent;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class QuestionDO implements Serializable {
+public class SingleEventQuestionDO implements Serializable {
     public String text;
-    public ArrayList<AnswerDO> answers;
+    public ArrayList<SingleEventAnswerDO> answers;
     public String additionalInfo;
 
     public String getText() {
@@ -16,11 +16,11 @@ public class QuestionDO implements Serializable {
         this.text = text;
     }
 
-    public ArrayList<AnswerDO> getAnswers() {
+    public ArrayList<SingleEventAnswerDO> getAnswers() {
         return answers;
     }
 
-    public void setAnswers(ArrayList<AnswerDO> answers) {
+    public void setAnswers(ArrayList<SingleEventAnswerDO> answers) {
         this.answers = answers;
     }
 

@@ -1,8 +1,8 @@
-package iota.participationPlugin;
+package iota.participationPlugin.DOs.singleEvent;
 
 import java.io.Serializable;
 
-public class AnswerDO implements Serializable {
+public class SingleEventAnswerDO implements Serializable {
     public int value;
     public String text;
     public String additionalInfo;
