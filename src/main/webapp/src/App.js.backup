@@ -1,0 +1,28 @@
+import * as React from 'react';
+import {LightVariant} from "./LightVariant"
+import ReactDOM from 'react-dom';
+import "@patternfly/react-core/dist/styles/base.css";
+import './fonts.css';
+import {Grid, GridItem} from '@patternfly/react-core';
+import {SingleSelectDescription} from "./SingleSelectDescription";
+
+
+
+function App(){
+    const Basic = () => (
+
+        <Grid hasGutter>
+            <Grid>
+                <GridItem span={12}><LightVariant/></GridItem>
+            </Grid>
+            <Grid>
+                <GridItem span={12}><SingleSelectDescription/></GridItem>
+            </Grid>
+        </Grid>
+    )
+
+    const rootElement = document.getElementById("root");
+    ReactDOM.render(<Basic />, rootElement);
+}
+
+export default App;
