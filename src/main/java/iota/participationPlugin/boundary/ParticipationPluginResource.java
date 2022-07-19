@@ -1,7 +1,8 @@
-package iota.participationPlugin;
+package iota.participationPlugin.boundary;
 
 
-import iota.participationPlugin.DOs.singleEvent.SingleEventParticipationPluginDO;
+import iota.participationPlugin.entity.singleEvent.SingleEventParticipationPluginDO;
+import iota.participationPlugin.control.ParticipationPluginBA;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -10,14 +11,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Set;
 
-@Path("/ParticipationPlugin")
+
 public class ParticipationPluginResource {
     @Inject
     ParticipationPluginBA participationPlugin;
 
 
     @GET
-    @Path("/test2")
     @Produces(MediaType.TEXT_PLAIN)
     public String getOpenParticipationEvents() {
         Set<SingleEventParticipationPluginDO> participationPluginSet = participationPlugin.getOpenParticipationEvents();
@@ -35,7 +35,6 @@ public class ParticipationPluginResource {
     }
 
     @GET
-    @Path("/test1")
     @Produces(MediaType.TEXT_PLAIN)
     public String getParticipationEvents() {
         Set<SingleEventParticipationPluginDO> participationPluginSet = participationPlugin.getParticipationEventNames();

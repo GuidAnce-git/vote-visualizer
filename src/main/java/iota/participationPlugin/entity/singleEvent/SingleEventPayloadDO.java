@@ -1,4 +1,4 @@
-package iota.participationPlugin.DOs.singleEvent;
+package iota.participationPlugin.entity.singleEvent;
 
 import java.io.Serializable;
 import java.util.ArrayList;

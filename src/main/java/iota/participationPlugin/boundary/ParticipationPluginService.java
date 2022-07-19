@@ -1,8 +1,8 @@
-package iota.participationPlugin;
+package iota.participationPlugin.boundary;
 
-import iota.participationPlugin.DOs.eventStatus.EventStatusParticipationPluginDO;
-import iota.participationPlugin.DOs.events.EventsParticipationPluginDO;
-import iota.participationPlugin.DOs.singleEvent.SingleEventParticipationPluginDO;
+import iota.participationPlugin.entity.eventStatus.EventStatusParticipationPluginDO;
+import iota.participationPlugin.entity.events.EventsParticipationPluginDO;
+import iota.participationPlugin.entity.singleEvent.SingleEventParticipationPluginDO;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 import javax.inject.Singleton;

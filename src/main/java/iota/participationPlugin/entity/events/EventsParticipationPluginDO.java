@@ -1,6 +1,4 @@
-package iota.participationPlugin.DOs.events;
-
-import iota.participationPlugin.DOs.events.EventsDataDO;
+package iota.participationPlugin.entity.events;
 
 import java.io.Serializable;
 

@@ -1,11 +1,11 @@
-package iota.participationPlugin;
+package iota.participationPlugin.control;
 
-import iota.participationPlugin.DOs.eventStatus.EventStatusAnswerEnum;
-import iota.participationPlugin.DOs.eventStatus.EventStatusParticipationPluginDO;
-import iota.participationPlugin.DOs.events.EventsParticipationPluginDO;
-import iota.participationPlugin.DOs.singleEvent.SingleEventParticipationPluginDO;
+import iota.participationPlugin.entity.eventStatus.EventStatusAnswerEnum;
+import iota.participationPlugin.entity.eventStatus.EventStatusParticipationPluginDO;
+import iota.participationPlugin.entity.events.EventsParticipationPluginDO;
+import iota.participationPlugin.entity.singleEvent.SingleEventParticipationPluginDO;
+import iota.participationPlugin.boundary.ParticipationPluginService;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
