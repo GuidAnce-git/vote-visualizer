@@ -104,7 +104,7 @@ ComplexStatisticsCard.propTypes = {
             "dark",
             "white",
         ]),
-        amount: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+        amount: PropTypes.oneOfType([PropTypes.string, PropTypes.any]),
         label: PropTypes.string,
     }),
     icon: PropTypes.node.isRequired,

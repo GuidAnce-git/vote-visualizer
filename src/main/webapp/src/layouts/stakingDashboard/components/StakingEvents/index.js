@@ -1,228 +1,207 @@
-import {useRowSelect} from '@table-library/react-table-library/select';
-import {Body, Cell, Header, HeaderCell, HeaderRow, Row, Table,} from '@table-library/react-table-library/table';
 import MDBox from "../../../../components/MDBox";
 import MDTypography from "../../../../components/MDTypography";
 import Card from "@mui/material/Card";
 import React, {useEffect, useState} from "react";
-import iotaAssembly from "../../../../assets/images/small-logos/iota_assembly-mark.png";
-import MDBadge from "../../../../components/MDBadge";
-import MDAvatar from "../../../../components/MDAvatar";
 import Grid from "@mui/material/Grid";
 import ComplexStatisticsCard from "../../../../examples/Cards/StatisticsCards/ComplexStatisticsCard";
-import WeekendIcon from "@mui/icons-material/Weekend";
-import LeaderboardIcon from "@mui/icons-material/Leaderboard";
-import {getStakingEvents} from "../../../../services/stakingEvents";
+import HorizontalSplitIcon from '@mui/icons-material/HorizontalSplit';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import axios from "axios";
+import {DataGrid, GridColDef, GridRowsProp} from "@mui/x-data-grid";
+import MDBadge from "../../../../components/MDBadge";
 
 
 export default function StakingEvents() {
-
-    const [events, setEvents] = useState([]);
     const [selectedItem, setSelectedItem] = useState([]);
+    const [data, setData] = useState([]);
+    const [pageSize, setPageSize] = React.useState(5);
 
     // load data from API
     useEffect(() => {
-        let mounted = true;
-        getStakingEvents()
-            .then(data => {
-                if (mounted) {
-                    setEvents(data)
-                }
+        axios("http://localhost:8080/test/staking")
+            .then((res) => {
+                setData(res.data);
             })
-        return () => mounted = false;
-    }, [])
+            .catch((err) => console.log(err))
+    }, []);
 
-    const Network = ({image, name}) => (
-        <MDBox display="flex" alignItems="center" lineHeight={1}>
-            <MDAvatar src={image} name={name} size="sm"/>
-            <MDTypography variant="button" fontWeight="medium" ml={1} lineHeight={1}>
-                {name}
-            </MDTypography>
-        </MDBox>
-    );
 
-    const rows = [];
-    events.map((item, i) => (
+    const rows: GridRowsProp = [];
+    data.map(item => {
         rows.push({
             id: item.eventId,
-            name: <Network image={iotaAssembly} name={item.name}/>,
-            type: (
-                <MDTypography variant="caption" color="text" fontWeight="medium">
-                    {item.payload.type === 1 ? "staking" : "voting"}
-                </MDTypography>
-            ),
-            status: (
-                <MDBox ml={-1}>
-                    <MDBadge badgeContent={item.status} color={item.status !== "ended" ? "success" : "dark"}
-                             variant="gradient" size="sm"/>
-                </MDBox>
-            )
+            icon: item.icon,
+            name: item.advancedName,
+            type: item.payload.type === 1 ? "staking" : "voting",
+            status: item.status
         })
-    ));
+    })
 
-    const data = {nodes: rows};
-    const select = useRowSelect(data, {
-            onChange: onSelectChange,
+    const columns: GridColDef[] = [
+        {
+            field: 'icon',
+            headerName: '',
+            width: 50,
+            renderCell: (params) =>
+                <img src={require('../../../../assets/images/small-logos/' + params.value)}
+                     height={35}
+                     alt=""/>,
         },
         {
-            sCarryForward: false,
-        });
+            field: 'name',
+            headerName: 'Name',
+            flex: 1
+        },
+        {
+            field: 'type',
+            headerName: 'Type',
+            flex: 0.5
+        },
+        {
+            field: 'status',
+            headerName: 'Status',
+            flex: 0.5,
+            renderCell: (params) =>
+                <MDBox ml={-1}>
+                    <MDBadge badgeContent={params.value}
+                             color={params.value !== "ended" ? "success" : "dark"}
+                             variant="gradient" size="sm"/>
+                </MDBox>
+        },
+    ];
 
-    function onSelectChange(action, state) {
-        if (action.type === "ADD_BY_ID_EXCLUSIVELY") {
-            setSelectedItem(events.find(item => item.eventId === state.id));
-        }
-    }
 
-    return (
-        <Grid item xs={12} md={6} lg={12}>
-            <Card>
-                <Grid item xs={12} md={6} lg={12}>
-                    <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
-                        <MDBox>
-                            <MDTypography variant="h6" gutterBottom>
-                                IOTA Events
+    return (<Grid item xs={12} md={6} lg={12}>
+        <Card>
+            <Grid item xs={12} md={6} lg={12}>
+                <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
+                    <MDBox>
+                        <MDTypography variant="h6" gutterBottom>
+                            IOTA Events
+                        </MDTypography>
+                    </MDBox>
+                </MDBox>
+                <MDBox>
+                    <div style={{display: 'flex', height: '100%'}}>
+                        <DataGrid
+                            rows={rows}
+                            columns={columns}
+                            pageSize={pageSize}
+                            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                            rowsPerPageOptions={[5, 10, 20]}
+                            disableColumnFilter
+                            hideDescendantCount
+                            disableRowGrouping
+                            disableColumnMenu
+                            autoHeight
+                            hideFooterSelectedRowCount
+                            sx={{
+                                boxShadow: 0,
+                                border: 0,
+                                '& .MuiDataGrid-row:hover': {
+                                    backgroundColor: '#c7c7c7',
+                                    border: 'none'
+                                },
+                            }}
+                            onRowClick={item => setSelectedItem(data.find(item2 => item2.eventId === item.id))}
+                        />
+                    </div>
+                </MDBox>
+            </Grid>
+        </Card>
+        <MDBox mb={3} mt={4.5}>
+            <Grid container spacing={3}>
+                <Grid item xs={12} md={7}>
+                    <Card id="description">
+                        <MDBox pt={3} px={2}>
+                            <MDTypography variant="h6" fontWeight="medium">
+                                Description
                             </MDTypography>
                         </MDBox>
-                    </MDBox>
+                        <MDBox pt={1} pb={2} px={2}>
+                            <MDTypography variant="h6" fontWeight="light">
+                                {selectedItem.additionalInfo}
+                            </MDTypography>
+                        </MDBox>
+                    </Card>
                 </Grid>
-                <MDBox>
-                    <Table data={data} select={select}>
-                        {(tableList) => (
-                            <>
-                                <Header>
-                                    <HeaderRow>
-                                        <HeaderCell>Name</HeaderCell>
-                                        <HeaderCell>Type</HeaderCell>
-                                        <HeaderCell>Status</HeaderCell>
-                                    </HeaderRow>
-                                </Header>
-                                <Body>
-                                    {tableList.map((item) => (
-                                        <Row key={item.id} item={item}>
-                                            <Cell>{item.name}</Cell>
-                                            <Cell>{item.type}</Cell>
-                                            <Cell>{item.status}</Cell>
-                                        </Row>
-                                    ))}
-                                </Body>
-                            </>
-                        )}
-                    </Table>
-                </MDBox>
-            </Card>
-            <MDBox mb={3} mt={4.5}>
-                <Grid container spacing={3}>
-                    <Grid item xs={12} md={7}>
-                        <Card id="description">
-                            <MDBox pt={3} px={2}>
-                                <MDTypography variant="h6" fontWeight="medium">
-                                    Description
-                                </MDTypography>
-                            </MDBox>
-                            <MDBox pt={1} pb={2} px={2}>
-                                <MDTypography variant="h6" fontWeight="light">
-                                    {selectedItem.additionalInfo}
-                                </MDTypography>
-                            </MDBox>
-                        </Card>
-                    </Grid>
-                    <Grid item xs={12} md={5}>
-                        <Card id="information">
-                            <MDBox pt={3} px={2}>
-                                <MDTypography variant="h6" fontWeight="medium">
-                                    Information
-                                </MDTypography>
-                            </MDBox>
-                            <MDBox pt={1} pb={2} px={2}>
-                                <MDTypography variant="h6" fontWeight="light">
-                                    <table>
-                                        <tbody>
-                                        <tr>
-                                            <td>
-                                                Created at:
-                                            </td>
-                                            <td>
-                                                {selectedItem.createdAt}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                Last update:
-                                            </td>
-                                            <td>
-                                                {selectedItem.updatedAt}
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </MDTypography>
-                            </MDBox>
-                        </Card>
-                    </Grid>
-                </Grid>
-            </MDBox>
-            <Grid container spacing={3}>
-                <Grid item xs={12} md={6} lg={3}>
-                    <MDBox mb={1.5}>
-                        <ComplexStatisticsCard
-                            color="dark"
-                            icon={<WeekendIcon fontSize='medium'/>}
-                            title="staked"
-                            count={selectedItem.staking?.staked}
-                            percentage={{
-                                color: "success",
-                                amount: "+55%",
-                                label: "than last week",
-                            }}
-                        />
-                    </MDBox>
-                </Grid>
-                <Grid item xs={12} md={6} lg={3}>
-                    <MDBox mb={1.5}>
-                        <ComplexStatisticsCard
-                            icon={<LeaderboardIcon fontSize='medium'/>}
-                            title="rewarded"
-                            count={selectedItem.staking?.rewarded}
-                            percentage={{
-                                color: "success",
-                                amount: "+3%",
-                                label: "than last month",
-                            }}
-                        />
-                    </MDBox>
-                </Grid>
-                <Grid item xs={12} md={6} lg={3}>
-                    <MDBox mb={1.5}>
-                        <ComplexStatisticsCard
-                            color="success"
-                            icon="store"
-                            title="Revenue"
-                            count="34k"
-                            percentage={{
-                                color: "success",
-                                amount: "+1%",
-                                label: "than yesterday",
-                            }}
-                        />
-                    </MDBox>
-                </Grid>
-                <Grid item xs={12} md={6} lg={3}>
-                    <MDBox mb={1.5}>
-                        <ComplexStatisticsCard
-                            color="primary"
-                            icon="person_add"
-                            title="Followers"
-                            count="+91"
-                            percentage={{
-                                color: "success",
-                                amount: "",
-                                label: "Just updated",
-                            }}
-                        />
-                    </MDBox>
+                <Grid item xs={12} md={5}>
+                    <Card id="information">
+                        <MDBox pt={3} px={2}>
+                            <MDTypography variant="h6" fontWeight="medium">
+                                Information
+                            </MDTypography>
+                        </MDBox>
+                        <MDBox pt={1} pb={2} px={2}>
+                            <MDTypography variant="h6" fontWeight="light">
+                                <table>
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            Created at:
+                                        </td>
+                                        <td>
+                                            {selectedItem.createdAt}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Last update:
+                                        </td>
+                                        <td>
+                                            {selectedItem.updatedAt}
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </MDTypography>
+                        </MDBox>
+                    </Card>
                 </Grid>
             </Grid>
-        </Grid>
+        </MDBox>
+        <Grid container spacing={3}>
+            <Grid item xs={12} md={6} lg={4}>
+                <MDBox mb={1.5}>
+                    <ComplexStatisticsCard
+                        color="dark"
+                        icon={<HorizontalSplitIcon fontSize='medium'/>}
+                        title="staked"
+                        count={selectedItem.staking?.formattedStaked}
+                        percentage={{
+                            color: selectedItem.staking?.percentColor,
+                            amount: selectedItem.staking?.staked24hInPercent,
+                            label: "in 24h",
+                        }}
+                    />
+                </MDBox>
+            </Grid>
+            <Grid item xs={12} md={6} lg={4}>
+                <MDBox mb={1.5}>
+                    <ComplexStatisticsCard
+                        icon={<EmojiEventsIcon fontSize='medium'/>}
+                        title="rewarded"
+                        count={selectedItem.staking?.formattedReward}
+                        percentage={{
+                            color: selectedItem.staking?.percentColor,
+                            amount: selectedItem.staking?.rewarded24hInPercent,
+                            label: "in 24h",
+                        }}
+                    />
+                </MDBox>
+            </Grid>
+            <Grid item xs={12} md={6} lg={4}>
+                <MDBox mb={1.5}>
+                    <ComplexStatisticsCard
+                        color="success"
+                        icon={<AccessTimeIcon fontSize='medium'/>}
+                        title="duration"
+                        count={selectedItem.eventEndsIn}
 
-    );
+                    />
+                </MDBox>
+            </Grid>
+        </Grid>
+    </Grid>)
 }

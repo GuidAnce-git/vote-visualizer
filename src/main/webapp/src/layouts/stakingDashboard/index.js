@@ -13,17 +13,14 @@
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  */
 import Grid from "@mui/material/Grid";
-import WeekendIcon from '@mui/icons-material/Weekend';
 import MDBox from "../../components/MDBox";
 import DashboardLayout from "../../examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "../../examples/Navbars/DashboardNavbar";
 import Footer from "../../examples/Footer";
 import ReportsBarChart from "../../examples/Charts/BarCharts/ReportsBarChart";
 import ReportsLineChart from "../../examples/Charts/LineCharts/ReportsLineChart";
-import ComplexStatisticsCard from "../../examples/Cards/StatisticsCards/ComplexStatisticsCard";
 import reportsBarChartData from "./data/reportsBarChartData";
 import reportsLineChartData from "./data/reportsLineChartData";
-import LeaderboardIcon from '@mui/icons-material/Leaderboard';
 import StakingEvents from "./components/StakingEvents";
 
 function StakingDashboard() {

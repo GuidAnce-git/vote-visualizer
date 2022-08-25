@@ -18,11 +18,9 @@ import MDBox from "../../../../../components/MDBox";
 import MDTypography from "../../../../../components/MDTypography";
 import MDAvatar from "../../../../../components/MDAvatar";
 import iotaAssembly from "../../../../../assets/images/small-logos/iota_assembly-mark.png";
-import React, {useState, useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {getEvents} from "../../../../../services/events";
 import MDBadge from "../../../../../components/MDBadge";
-import MDButton from "../../../../../components/MDButton";
-import Button from "@mui/material/Button";
 
 export default function Data() {
     const [events, setEvents] = useState([]);
@@ -32,7 +30,7 @@ export default function Data() {
         let mounted = true;
         getEvents()
             .then(items => {
-                if(mounted) {
+                if (mounted) {
                     setEvents(items)
                 }
             })
@@ -70,17 +68,21 @@ export default function Data() {
         rows.push({
             name: <Network image={iotaAssembly} name={item.name}/>,
             type: (
-                <MDTypography variant="caption" color="text" fontWeight="medium" >
-                    {item.payload.type === 1 ? "staking" : "voting" }
+                <MDTypography variant="caption" color="text" fontWeight="medium">
+                    {item.payload.type === 1 ? "staking" : "voting"}
                 </MDTypography>
             ),
             status: (
                 <MDBox ml={-1}>
-                    <MDBadge badgeContent={item.status} color={item.status !== "ended" ? "success" : "dark"} variant="gradient" size="sm" />
+                    <MDBadge badgeContent={item.status} color={item.status !== "ended" ? "success" : "dark"}
+                             variant="gradient" size="sm"/>
                 </MDBox>
             )
         })
     ));
 
     return {columns, rows};
+}
+
+export class data {
 }

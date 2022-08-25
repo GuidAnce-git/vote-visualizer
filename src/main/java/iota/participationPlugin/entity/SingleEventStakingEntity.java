@@ -6,7 +6,10 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.json.bind.annotation.JsonbDateFormat;
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.time.ZonedDateTime;
 
 
@@ -17,11 +20,19 @@ public class SingleEventStakingEntity extends PanacheEntityBase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String staked;
+    private Double staked;
 
-    private String rewarded;
+    private Double rewarded;
 
     private String symbol;
+
+    private String formattedReward;
+
+    private String formattedStaked;
+
+    private String Rewarded24hInPercent;
+    private String Staked24hInPercent;
+    private String PercentColor;
 
     @JsonbDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
     @CreationTimestamp
@@ -39,19 +50,19 @@ public class SingleEventStakingEntity extends PanacheEntityBase {
         this.id = id;
     }
 
-    public String getStaked() {
+    public Double getStaked() {
         return staked;
     }
 
-    public void setStaked(String staked) {
+    public void setStaked(Double staked) {
         this.staked = staked;
     }
 
-    public String getRewarded() {
+    public Double getRewarded() {
         return rewarded;
     }
 
-    public void setRewarded(String rewarded) {
+    public void setRewarded(Double rewarded) {
         this.rewarded = rewarded;
     }
 
@@ -77,5 +88,45 @@ public class SingleEventStakingEntity extends PanacheEntityBase {
 
     public void setUpdatedAt(ZonedDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getFormattedReward() {
+        return formattedReward;
+    }
+
+    public void setFormattedReward(String formattedReward) {
+        this.formattedReward = formattedReward;
+    }
+
+    public String getFormattedStaked() {
+        return formattedStaked;
+    }
+
+    public void setFormattedStaked(String formattedStaked) {
+        this.formattedStaked = formattedStaked;
+    }
+
+    public String getRewarded24hInPercent() {
+        return Rewarded24hInPercent;
+    }
+
+    public void setRewarded24hInPercent(String rewarded24hInPercent) {
+        Rewarded24hInPercent = rewarded24hInPercent;
+    }
+
+    public String getPercentColor() {
+        return PercentColor;
+    }
+
+    public void setPercentColor(String percentColor) {
+        PercentColor = percentColor;
+    }
+
+    public String getStaked24hInPercent() {
+        return Staked24hInPercent;
+    }
+
+    public void setStaked24hInPercent(String staked24hInPercent) {
+        Staked24hInPercent = staked24hInPercent;
     }
 }

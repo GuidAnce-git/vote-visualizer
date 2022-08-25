@@ -14,7 +14,7 @@ import java.util.List;
 
 @Entity
 @NamedQueries(
-        @NamedQuery(name="SingleEventDataEntity.findEntitiesByType", query = "SELECT s FROM SingleEventDataEntity s " +
+        @NamedQuery(name = "SingleEventDataEntity.findEntitiesByType", query = "SELECT s FROM SingleEventDataEntity s " +
                 "JOIN s.payload s1 WHERE s1.type = :type ORDER BY s.name")
 )
 public class SingleEventDataEntity extends PanacheEntityBase {
@@ -37,6 +37,7 @@ public class SingleEventDataEntity extends PanacheEntityBase {
 
     @Column(length = 1024)
     private String name;
+    private String advancedName;
     private Long milestoneIndexCommence;
     private Long milestoneIndexStart;
     private Long milestoneIndexEnd;
@@ -44,6 +45,8 @@ public class SingleEventDataEntity extends PanacheEntityBase {
     @Column(length = 5120)
     private String additionalInfo;
     private String checksum;
+    private String EventEndsIn;
+    private String icon;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn
@@ -167,5 +170,29 @@ public class SingleEventDataEntity extends PanacheEntityBase {
 
     public void setStaking(SingleEventStakingEntity staking) {
         this.staking = staking;
+    }
+
+    public String getEventEndsIn() {
+        return EventEndsIn;
+    }
+
+    public void setEventEndsIn(String eventEndsIn) {
+        EventEndsIn = eventEndsIn;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String logo) {
+        this.icon = logo;
+    }
+
+    public String getAdvancedName() {
+        return advancedName;
+    }
+
+    public void setAdvancedName(String advancedName) {
+        this.advancedName = advancedName;
     }
 }
