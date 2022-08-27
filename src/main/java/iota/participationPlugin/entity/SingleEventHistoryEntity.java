@@ -2,18 +2,22 @@ package iota.participationPlugin.entity;
 
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkus.panache.common.Parameters;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.json.bind.annotation.JsonbDateFormat;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import java.time.ZonedDateTime;
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Entity
+@NamedQueries({
+        @NamedQuery(name = "SingleEventHistoryEntity.findRewardedByMonth", query = "SELECT s FROM SingleEventHistoryEntity s " +
+                "WHERE s.eventId = :eventId AND s.createdAt BETWEEN :startDate AND :endDate " +
+                "ORDER BY s.rewarded")
+})
 public class SingleEventHistoryEntity extends PanacheEntityBase {
 
     @Id
@@ -22,17 +26,22 @@ public class SingleEventHistoryEntity extends PanacheEntityBase {
 
     private String eventId;
 
-    private Double staked;
+    private Long staked;
 
-    private Double rewarded;
+    private Long rewarded;
 
     @JsonbDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
     @CreationTimestamp
-    private ZonedDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @JsonbDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
     @UpdateTimestamp
-    private ZonedDateTime updatedAt;
+    private LocalDateTime updatedAt;
+
+    public static List<SingleEventHistoryEntity> findRewardedByMonth(String eventId, LocalDateTime startDate, LocalDateTime endDate) {
+        return find("#SingleEventHistoryEntity.findRewardedByMonth",
+                Parameters.with("eventId", eventId).and("startDate", startDate).and("endDate", endDate)).list();
+    }
 
     public Long getId() {
         return id;
@@ -42,19 +51,19 @@ public class SingleEventHistoryEntity extends PanacheEntityBase {
         this.id = id;
     }
 
-    public ZonedDateTime getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(ZonedDateTime createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public ZonedDateTime getUpdatedAt() {
+    public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(ZonedDateTime updatedAt) {
+    public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 
@@ -66,19 +75,19 @@ public class SingleEventHistoryEntity extends PanacheEntityBase {
         this.eventId = eventId;
     }
 
-    public Double getStaked() {
+    public Long getStaked() {
         return staked;
     }
 
-    public void setStaked(Double staked) {
+    public void setStaked(Long staked) {
         this.staked = staked;
     }
 
-    public Double getRewarded() {
+    public Long getRewarded() {
         return rewarded;
     }
 
-    public void setRewarded(Double rewarded) {
+    public void setRewarded(Long rewarded) {
         this.rewarded = rewarded;
     }
 }

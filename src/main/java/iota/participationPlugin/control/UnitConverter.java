@@ -26,24 +26,33 @@ public class UnitConverter {
     }
 
     public void convertToHigherUnit(SingleEventStakingEntity singleEventStakingEntity) {
-
+        StringBuilder stringBuilder = new StringBuilder();
         if (Objects.equals(singleEventStakingEntity.getSymbol(), IotaSymbolsEnum.MICRO_ASMB.getName())) {
-            StringBuilder stringBuilder = new StringBuilder();
             Formatter formatter = new Formatter(stringBuilder, Locale.GERMAN);
-            formatter.format("%(,.0f", singleEventStakingEntity.getRewarded() / 1000000);
+            formatter.format("%d", singleEventStakingEntity.getRewarded() / 1000000);
             stringBuilder.append(" ").append(IotaSymbolsEnum.ASMB.getName());
             singleEventStakingEntity.setFormattedReward(stringBuilder.toString());
         }
 
         if (Objects.equals(singleEventStakingEntity.getSymbol(), IotaSymbolsEnum.SMR.getName())) {
-            StringBuilder stringBuilder = new StringBuilder();
             Formatter formatter = new Formatter(stringBuilder, Locale.GERMAN);
-            formatter.format("%(,.0f", singleEventStakingEntity.getRewarded() / 100000);
+            formatter.format("%d", singleEventStakingEntity.getRewarded() / 100000);
             stringBuilder.append(" ").append(IotaSymbolsEnum.SMR.getName());
             singleEventStakingEntity.setFormattedReward(stringBuilder.toString());
         }
+    }
 
+    public Long getConvertedASMB(SingleEventStakingEntity singleEventStakingEntity, Long value) {
 
+        if (Objects.equals(singleEventStakingEntity.getSymbol(), IotaSymbolsEnum.MICRO_ASMB.getName())) {
+            return value / 1000000;
+        }
+
+        if (Objects.equals(singleEventStakingEntity.getSymbol(), IotaSymbolsEnum.SMR.getName())) {
+            return value / 100000;
+        }
+
+        return null;
     }
 
 }

@@ -15,6 +15,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,18 +32,13 @@ import java.util.concurrent.TimeUnit;
 public class ParticipationPluginBA {
 
     private static final int TIME_BETWEEN_MILESTONES = 10;
-
+    @Inject
+    UnitConverter unitConverter;
     @Inject
     @RestClient
     ParticipationPluginService participationPluginService;
-
     @Inject
     QuestionMapper questionMapper;
-
-    @Inject
-    UnitConverter unitConverter;
-
-
     @PersistenceContext
     EntityManager entityManager;
 
@@ -96,6 +95,35 @@ public class ParticipationPluginBA {
         }
         if ((100.0d - growth) < 0.0d) {
             value.getStaking().setPercentColor("primary");
+        }
+    }
+
+    private static void setLast12Month(SingleEventDataEntity value) {
+        YearMonth ym = YearMonth.now();
+        List<String> last12Months = new ArrayList<>();
+        for (int i = 11; i >= 0; i--) {
+            last12Months.add(String.valueOf(ym.minusMonths(i).getMonth()).charAt(0) + String.valueOf(ym.minusMonths(i).getMonth()).substring(1, 3).toLowerCase());
+        }
+        value.getStaking().setLast12Months(String.join(",", last12Months));
+
+    }
+
+    private void setRewardGrowthFor12Months(SingleEventDataEntity singleEventDataEntity) {
+
+        List<Long> resultList = new ArrayList<>();
+        if (!singleEventDataEntity.getStatus().equals(StatusEnum.ENDED.getName())) {
+            for (int i = 11; i >= 0; i--) {
+                LocalDateTime startDate = LocalDate.now().minusMonths(i).withDayOfMonth(1).atStartOfDay();
+                LocalDateTime endDate = LocalDate.now().minusMonths(i).withDayOfMonth(LocalDate.now().minusMonths(i).lengthOfMonth()).atStartOfDay();
+                List<Long> test = SingleEventHistoryEntity.findRewardedByMonth(singleEventDataEntity.getEventId(), startDate, endDate).stream().map(SingleEventHistoryEntity::getRewarded).toList();
+                if (!test.isEmpty()) {
+                    resultList.add(unitConverter.getConvertedASMB(singleEventDataEntity.getStaking(), test.get(test.size() - 1) - test.get(0)));
+                } else {
+                    resultList.add(0L);
+
+                }
+            }
+            singleEventDataEntity.getStaking().setRewardsLast12Months(resultList);
         }
     }
 
@@ -205,7 +233,8 @@ public class ParticipationPluginBA {
             setAdvancedName(value);
             createHistoricalEntry(value);
             set24hRewards(value);
-            set24hStaking(value);
+            setHistoricalStakingData(value);
+            setRewardGrowthFor12Months(value);
         }
     }
 
@@ -217,11 +246,13 @@ public class ParticipationPluginBA {
         }
     }
 
-    private void set24hStaking(SingleEventDataEntity value) {
+    private void setHistoricalStakingData(SingleEventDataEntity value) {
         if (value.getStaking() != null) {
             Double growth = getStakedGrowth(value.getEventId());
             value.getStaking().setStaked24hInPercent(String.format("%.2f%%", 100.0d - growth));
             setColor(value, growth);
+            setLast12Month(value);
+            setRewardGrowthFor12Months(value);
         }
     }
 
@@ -262,5 +293,6 @@ public class ParticipationPluginBA {
 
         }
     }
+
 
 }

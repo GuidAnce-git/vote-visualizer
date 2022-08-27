@@ -6,11 +6,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.json.bind.annotation.JsonbDateFormat;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import java.time.ZonedDateTime;
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Entity
@@ -20,9 +18,9 @@ public class SingleEventStakingEntity extends PanacheEntityBase {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Double staked;
+    private Long staked;
 
-    private Double rewarded;
+    private Long rewarded;
 
     private String symbol;
 
@@ -33,14 +31,18 @@ public class SingleEventStakingEntity extends PanacheEntityBase {
     private String Rewarded24hInPercent;
     private String Staked24hInPercent;
     private String PercentColor;
+    private String last12Months;
+
+    @ElementCollection
+    private List<Long> rewardsLast12Months;
 
     @JsonbDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
     @CreationTimestamp
-    private ZonedDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @JsonbDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
     @UpdateTimestamp
-    private ZonedDateTime updatedAt;
+    private LocalDateTime updatedAt;
 
     public Long getId() {
         return id;
@@ -50,19 +52,19 @@ public class SingleEventStakingEntity extends PanacheEntityBase {
         this.id = id;
     }
 
-    public Double getStaked() {
+    public Long getStaked() {
         return staked;
     }
 
-    public void setStaked(Double staked) {
+    public void setStaked(Long staked) {
         this.staked = staked;
     }
 
-    public Double getRewarded() {
+    public Long getRewarded() {
         return rewarded;
     }
 
-    public void setRewarded(Double rewarded) {
+    public void setRewarded(Long rewarded) {
         this.rewarded = rewarded;
     }
 
@@ -74,19 +76,19 @@ public class SingleEventStakingEntity extends PanacheEntityBase {
         this.symbol = symbol;
     }
 
-    public ZonedDateTime getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(ZonedDateTime createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public ZonedDateTime getUpdatedAt() {
+    public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(ZonedDateTime updatedAt) {
+    public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 
@@ -128,5 +130,21 @@ public class SingleEventStakingEntity extends PanacheEntityBase {
 
     public void setStaked24hInPercent(String staked24hInPercent) {
         Staked24hInPercent = staked24hInPercent;
+    }
+
+    public String getLast12Months() {
+        return last12Months;
+    }
+
+    public void setLast12Months(String last12Months) {
+        this.last12Months = last12Months;
+    }
+
+    public List<Long> getRewardsLast12Months() {
+        return rewardsLast12Months;
+    }
+
+    public void setRewardsLast12Months(List<Long> rewardsLast12Months) {
+        this.rewardsLast12Months = rewardsLast12Months;
     }
 }

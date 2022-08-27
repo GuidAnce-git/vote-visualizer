@@ -9,20 +9,16 @@
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  */
 
-import {useEffect, useMemo, useState} from "react";
+import {useEffect, useState} from "react";
 import {Navigate, Route, Routes, useLocation} from "react-router-dom";
 import {ThemeProvider} from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import Icon from '@mui/material/Icon';
-import MDBox from "./components/MDBox";
 import Sidenav from "./examples/Sidenav";
 import Configurator from "./examples/Configurator";
 import theme from "./assets/theme";
 import themeDark from "./assets/theme-dark";
-import rtlPlugin from "stylis-plugin-rtl";
-import createCache from "@emotion/cache";
 import routes from "./routes";
-import {setMiniSidenav, setOpenConfigurator, useMaterialUIController} from "./context";
+import {setMiniSidenav, useMaterialUIController} from "./context";
 import brandWhite from "./assets/images/logo-ct.png";
 import brandDark from "./assets/images/logo-ct-dark.png";
 
@@ -32,25 +28,14 @@ export default function App() {
         miniSidenav,
         direction,
         layout,
-        openConfigurator,
         sidenavColor,
         transparentSidenav,
         whiteSidenav,
         darkMode,
     } = controller;
     const [onMouseEnter, setOnMouseEnter] = useState(false);
-    const [rtlCache, setRtlCache] = useState(null);
     const {pathname} = useLocation();
 
-    // Cache for the rtl
-    useMemo(() => {
-        const cacheRtl = createCache({
-            key: "rtl",
-            stylisPlugins: [rtlPlugin],
-        });
-
-        setRtlCache(cacheRtl);
-    }, []);
 
     // Open sidenav when mouse enter on mini sidenav
     const handleOnMouseEnter = () => {
@@ -69,9 +54,7 @@ export default function App() {
     };
 
     // Change the openConfigurator state
-    const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
-
-    // Setting the dir attribute for the body element
+// Setting the dir attribute for the body element
     useEffect(() => {
         document.body.setAttribute("dir", direction);
     }, [direction]);
@@ -95,30 +78,6 @@ export default function App() {
 
             return null;
         });
-
-    const configsButton = (
-        <MDBox
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            width="3.25rem"
-            height="3.25rem"
-            bgColor="white"
-            shadow="sm"
-            borderRadius="50%"
-            position="fixed"
-            right="2rem"
-            bottom="2rem"
-            zIndex={99}
-            color="dark"
-            sx={{cursor: "pointer"}}
-            onClick={handleConfiguratorOpen}
-        >
-            <Icon fontSize="small" color="inherit">
-                settings
-            </Icon>
-        </MDBox>
-    );
 
     return (
         <ThemeProvider theme={darkMode ? themeDark : theme}>

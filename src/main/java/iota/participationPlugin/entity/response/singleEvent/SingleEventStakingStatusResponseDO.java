@@ -1,27 +1,26 @@
 package iota.participationPlugin.entity.response.singleEvent;
 
 import java.io.Serializable;
-import java.util.Set;
 
 public class SingleEventStakingStatusResponseDO implements Serializable {
 
-    private Double staked;
-    private Double rewarded;
+    private Long staked;
+    private Long rewarded;
     private String symbol;
 
-    public Double getStaked() {
+    public Long getStaked() {
         return staked;
     }
 
-    public void setStaked(Double staked) {
+    public void setStaked(Long staked) {
         this.staked = staked;
     }
 
-    public Double getRewarded() {
+    public Long getRewarded() {
         return rewarded;
     }
 
-    public void setRewarded(Double rewarded) {
+    public void setRewarded(Long rewarded) {
         this.rewarded = rewarded;
     }
 

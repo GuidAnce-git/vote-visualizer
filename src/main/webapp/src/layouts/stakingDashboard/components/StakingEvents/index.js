@@ -10,12 +10,16 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import axios from "axios";
 import {DataGrid, GridColDef, GridRowsProp} from "@mui/x-data-grid";
 import MDBadge from "../../../../components/MDBadge";
+import ReportsLineChart from "../../../../examples/Charts/LineCharts/ReportsLineChart";
+import reportsLineChartData from "../../data/reportsLineChartData";
 
 
 export default function StakingEvents() {
     const [selectedItem, setSelectedItem] = useState([]);
     const [data, setData] = useState([]);
     const [pageSize, setPageSize] = React.useState(5);
+    const {sales, tasks} = reportsLineChartData;
+
 
     // load data from API
     useEffect(() => {
@@ -203,5 +207,47 @@ export default function StakingEvents() {
                 </MDBox>
             </Grid>
         </Grid>
+        <MDBox mt={4.5}>
+            <Grid container spacing={3}>
+                <Grid item xs={12} md={8} lg={6}>
+                    <MDBox mb={3}>
+                        <ReportsLineChart
+                            color="dark"
+                            title="stake history"
+                            description={
+                                <>
+                                    (<strong>+15%</strong>) increase in today sales.
+                                </>
+                            }
+                            date="updated 4 min ago"
+                            chart={{
+                                labels: selectedItem.staking?.last12Months.split(","),
+                                datasets: {
+                                    label: "Mobile apps",
+                                    data: []
+                                }
+                            }}
+                        />
+                    </MDBox>
+                </Grid>
+                <Grid item xs={12} md={8} lg={6}>
+                    <MDBox mb={3}>
+                        <ReportsLineChart
+                            color="info"
+                            title="reward history"
+                            description="Last Campaign Performance"
+                            date="campaign sent 2 days ago"
+                            chart={{
+                                labels: selectedItem.staking?.last12Months.split(","),
+                                datasets: {
+                                    label: selectedItem.staking?.symbol + " rewarded",
+                                    data: selectedItem.staking?.rewardsLast12Months
+                                }
+                            }}
+                        />
+                    </MDBox>
+                </Grid>
+            </Grid>
+        </MDBox>
     </Grid>)
 }

@@ -7,9 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.json.bind.annotation.JsonbDateFormat;
 import javax.persistence.*;
-import java.time.ZonedDateTime;
-import java.util.HashSet;
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 
@@ -22,11 +20,11 @@ public class SingleEventPayloadEntity extends PanacheEntityBase {
 
     @JsonbDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
     @CreationTimestamp
-    private ZonedDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @JsonbDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
     @UpdateTimestamp
-    private ZonedDateTime updatedAt;
+    private LocalDateTime updatedAt;
 
     private Long type;
 
@@ -54,19 +52,19 @@ public class SingleEventPayloadEntity extends PanacheEntityBase {
         this.type = type;
     }
 
-    public ZonedDateTime getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(ZonedDateTime createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public ZonedDateTime getUpdatedAt() {
+    public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(ZonedDateTime updatedAt) {
+    public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 

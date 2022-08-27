@@ -2,24 +2,15 @@ package iota.participationPlugin.entity;
 
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.panache.common.Parameters;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.json.bind.annotation.JsonbDateFormat;
 import javax.persistence.*;
-import java.time.ZonedDateTime;
-import java.util.Set;
+import java.time.LocalDateTime;
 
 
 @Entity
-@NamedQueries({
-        @NamedQuery(name = "SingleEventDataEntity.getByValue", query = "SELECT DISTINCT o FROM SingleEventDataEntity o " +
-                "JOIN o.payload s1 " +
-                "JOIN s1.questions s2 " +
-                "JOIN s2.answers s3 " +
-                "WHERE o.eventId = :eventId AND s3.value = :value")
-})
 public class SingleEventAnswersEntity extends PanacheEntityBase {
 
     @Id
@@ -28,11 +19,11 @@ public class SingleEventAnswersEntity extends PanacheEntityBase {
 
     @JsonbDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
     @CreationTimestamp
-    private ZonedDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @JsonbDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
     @UpdateTimestamp
-    private ZonedDateTime updatedAt;
+    private LocalDateTime updatedAt;
 
     private Long value;
 
@@ -46,26 +37,19 @@ public class SingleEventAnswersEntity extends PanacheEntityBase {
     private Long accumulated;
 
 
-    public static SingleEventAnswersEntity findByValue(Long value){
-        SingleEventDataEntity test = new SingleEventDataEntity();
-        test = find("#SingleEventDataEntity.getByValue", Parameters.with("eventId", "9e8e1a15c831441797912a86022f5a78fcb70e151e43fe84812d4c7f6eb79a7b").and("value", value)).firstResult();
-
-        return null;
-    }
-
-    public ZonedDateTime getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(ZonedDateTime createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public ZonedDateTime getUpdatedAt() {
+    public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(ZonedDateTime updatedAt) {
+    public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 
