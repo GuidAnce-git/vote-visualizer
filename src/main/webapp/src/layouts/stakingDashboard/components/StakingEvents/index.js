@@ -85,7 +85,7 @@ export default function StakingEvents() {
                         </MDTypography>
                     </MDBox>
                 </MDBox>
-                <MDBox>
+                <MDBox px={3}>
                     <div style={{display: 'flex', height: '100%'}}>
                         <DataGrid
                             rows={rows}
@@ -214,17 +214,20 @@ export default function StakingEvents() {
                         <ReportsLineChart
                             color="dark"
                             title="stake history"
-                            description="Stake history for the last 12 months"
+                            description={
+                                selectedItem.staking?.rewardsLastMonths.length > 0 ?
+                                    "Stakes for the duration of the event of " + selectedItem.staking?.stakesLastMonths.length + " months" : ""
+                            }
                             date={
                                 selectedItem.staking && selectedItem.staking.monthWithoutStaking ?
                                     "Months without data points: " + selectedItem.staking?.monthWithoutStaking :
                                     ""
                             }
                             chart={{
-                                labels: selectedItem.staking?.last12Months.split(","),
+                                labels: selectedItem.staking?.eventTimeframe.split(","),
                                 datasets: {
-                                    label: "IOTA staked",
-                                    data: selectedItem.staking?.stakesLast12Months
+                                    label: "MIOTA staked",
+                                    data: selectedItem.staking?.stakesLastMonths
                                 }
                             }}
                         />
@@ -235,17 +238,20 @@ export default function StakingEvents() {
                         <ReportsLineChart
                             color="info"
                             title="reward history"
-                            description="Rewards history for the last 12 months"
+                            description={
+                                selectedItem.staking?.rewardsLastMonths.length > 0 ?
+                                    "Rewards for the duration of the event of " + selectedItem.staking?.rewardsLastMonths.length + " months" : ""
+                            }
                             date={
                                 selectedItem.staking && selectedItem.staking.monthWithoutRewards ?
                                     "Months without data points: " + selectedItem.staking?.monthWithoutRewards :
                                     ""
                             }
                             chart={{
-                                labels: selectedItem.staking?.last12Months.split(","),
+                                labels: selectedItem.staking?.eventTimeframe.split(","),
                                 datasets: {
-                                    label: selectedItem.staking?.symbol + " rewarded",
-                                    data: selectedItem.staking?.rewardsLast12Months
+                                    label: "ASMB rewarded",
+                                    data: selectedItem.staking?.rewardsLastMonths
                                 }
                             }}
                         />

@@ -13,7 +13,13 @@ import java.util.Objects;
 @ApplicationScoped
 public class UnitConverter {
 
-    public String convertFromIotaToUnits(SingleEventStakingEntity singleEventStakingEntity) {
+    public long convertIotaToMiota(Long iota) {
+
+        return Double.valueOf(iota / Math.pow(10, 6)).longValue();
+
+    }
+
+    public String convertIotaToHigherUnitsWithUnit(SingleEventStakingEntity singleEventStakingEntity) {
 
         if (singleEventStakingEntity.getStaked() > 1000000000000000D) {
             return String.format("%.1f", singleEventStakingEntity.getStaked() / Math.pow(10, 15)) + " " + IotaSymbolsEnum.PIOTA.getName();
@@ -61,7 +67,7 @@ public class UnitConverter {
     public String convertMilestoneToDate(Long currentMilestone) {
         NodeEntity nodeEntity = NodeEntity.findById(1L);
         long seconds = (nodeEntity.getConfirmedMilestoneIndex() - currentMilestone) * 10;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM.dd.yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         return LocalDateTime.now().minusSeconds(seconds).format(formatter);
     }
 

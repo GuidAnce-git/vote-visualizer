@@ -16,12 +16,10 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 
@@ -106,37 +104,43 @@ public class ParticipationPluginBA {
         }
     }
 
-    private static void setLast12Month(SingleEventDataEntity value) {
-        YearMonth ym = YearMonth.now();
-        List<String> last12Months = new ArrayList<>();
-        for (int i = 11; i >= 0; i--) {
-            last12Months.add(String.valueOf(ym.minusMonths(i).getMonth()).charAt(0) + String.valueOf(ym.minusMonths(i).getMonth()).substring(1, 3).toLowerCase());
-        }
-        if (value.getStaking() != null) {
-            value.getStaking().setLast12Months(String.join(",", last12Months));
+    private static void setEventTimeframe(SingleEventDataEntity value) {
+        List<String> lastMonths = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        LocalDate startDate = LocalDate.parse(value.getMilestoneIndexStartDate(), formatter).withDayOfMonth(1);
+        LocalDate endDate = LocalDate.parse(value.getMilestoneIndexEndDate(), formatter).withDayOfMonth(1);
+        Period diff = Period.between(startDate, endDate);
+
+        for (int i = 0; i < diff.getMonths() + 1; i++) {
+            lastMonths.add(startDate.plusMonths(i).getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH));
         }
 
+        if (value.getStaking() != null) {
+            value.getStaking().setEventTimeframe(String.join(",", lastMonths));
+        }
     }
 
-    private void setRewardGrowthFor12Months(SingleEventDataEntity singleEventDataEntity) {
-
+    private void setRewardGrowthForLastMonths(SingleEventDataEntity singleEventDataEntity) {
         List<Long> resultList = new ArrayList<>();
         List<String> notAvailableMonths = new ArrayList<>();
         if (!singleEventDataEntity.getStatus().equals(StatusEnum.ENDED.getName())) {
-            for (int i = 11; i >= 0; i--) {
-                LocalDateTime startDate = LocalDate.now().minusMonths(i).withDayOfMonth(1).atStartOfDay();
-                LocalDateTime endDate = LocalDate.now().minusMonths(i).withDayOfMonth(LocalDate.now().minusMonths(i).lengthOfMonth()).atStartOfDay();
-                List<Long> rewardsPerDay = SingleEventHistoryEntity.findRewardedByMonth(singleEventDataEntity.getEventId(), startDate, endDate).stream().map(SingleEventHistoryEntity::getRewarded).toList();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+            LocalDate startDate = LocalDate.parse(singleEventDataEntity.getMilestoneIndexStartDate(), formatter).withDayOfMonth(1);
+            LocalDate endDate = LocalDate.parse(singleEventDataEntity.getMilestoneIndexEndDate(), formatter).withDayOfMonth(1);
+            Period diff = Period.between(startDate, endDate);
+
+            for (int i = 0; i < diff.getMonths() + 1; i++) {
+                List<Long> rewardsPerDay = SingleEventHistoryEntity.findRewardedByMonth(singleEventDataEntity.getEventId(), startDate.plusMonths(i).withDayOfMonth(1).atStartOfDay(), startDate.plusMonths(i).withDayOfMonth(startDate.plusMonths(i).lengthOfMonth()).atStartOfDay()).stream().map(SingleEventHistoryEntity::getRewarded).toList();
                 if (!rewardsPerDay.isEmpty()) {
                     resultList.add(unitConverter.getConvertedASMB(singleEventDataEntity.getStaking(), rewardsPerDay.get(rewardsPerDay.size() - 1) - rewardsPerDay.get(0)));
                 } else {
                     //no data available
                     resultList.add(0L);
-                    notAvailableMonths.add(String.valueOf(LocalDate.now().minusMonths(i).getMonth()).substring(0, 3) +
-                            "/" + LocalDate.now().minusMonths(i).getYear());
+                    notAvailableMonths.add(startDate.plusMonths(i).getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH) + "/" + startDate.plusMonths(i).getYear());
                 }
             }
-            singleEventDataEntity.getStaking().setRewardsLast12Months(resultList);
+
+            singleEventDataEntity.getStaking().setRewardsLastMonths(resultList);
             if (notAvailableMonths.isEmpty()) {
                 singleEventDataEntity.getStaking().setMonthWithoutRewards("-");
             } else {
@@ -145,24 +149,27 @@ public class ParticipationPluginBA {
         }
     }
 
-    private void setStakingGrowthFor12Months(SingleEventDataEntity singleEventDataEntity) {
+    private void setStakingGrowthForLastMonths(SingleEventDataEntity singleEventDataEntity) {
         List<Long> resultList = new ArrayList<>();
         List<String> notAvailableMonths = new ArrayList<>();
         if (!singleEventDataEntity.getStatus().equals(StatusEnum.ENDED.getName())) {
-            for (int i = 11; i >= 0; i--) {
-                LocalDateTime startDate = LocalDate.now().minusMonths(i).withDayOfMonth(1).atStartOfDay();
-                LocalDateTime endDate = LocalDate.now().minusMonths(i).withDayOfMonth(LocalDate.now().minusMonths(i).lengthOfMonth()).atStartOfDay();
-                List<Long> stakesPerDay = SingleEventHistoryEntity.findStakedByMonth(singleEventDataEntity.getEventId(), startDate, endDate).stream().map(SingleEventHistoryEntity::getStaked).toList();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+            LocalDate startDate = LocalDate.parse(singleEventDataEntity.getMilestoneIndexStartDate(), formatter).withDayOfMonth(1);
+            LocalDate endDate = LocalDate.parse(singleEventDataEntity.getMilestoneIndexEndDate(), formatter).withDayOfMonth(1);
+            Period diff = Period.between(startDate, endDate);
+
+            for (int i = 0; i < diff.getMonths() + 1; i++) {
+                List<Long> stakesPerDay = SingleEventHistoryEntity.findStakedByMonth(singleEventDataEntity.getEventId(), startDate.plusMonths(i).withDayOfMonth(1).atStartOfDay(), startDate.plusMonths(i).withDayOfMonth(startDate.plusMonths(i).lengthOfMonth()).atStartOfDay()).stream().map(SingleEventHistoryEntity::getStaked).toList();
                 if (!stakesPerDay.isEmpty()) {
-                    resultList.add(stakesPerDay.get(stakesPerDay.size() - 1) - stakesPerDay.get(0));
+                    resultList.add(unitConverter.convertIotaToMiota(stakesPerDay.get(stakesPerDay.size() - 1) - stakesPerDay.get(0)));
                 } else {
                     //no data available
                     resultList.add(0L);
-                    notAvailableMonths.add(String.valueOf(LocalDate.now().minusMonths(i).getMonth()).substring(0, 3) +
-                            "/" + LocalDate.now().minusMonths(i).getYear());
+                    notAvailableMonths.add(startDate.plusMonths(i).getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH) + "/" + startDate.plusMonths(i).getYear());
                 }
             }
-            singleEventDataEntity.getStaking().setStakesLast12Months(resultList);
+
+            singleEventDataEntity.getStaking().setStakesLastMonths(resultList);
             if (notAvailableMonths.isEmpty()) {
                 singleEventDataEntity.getStaking().setMonthWithoutStaking("-");
             } else {
@@ -280,9 +287,9 @@ public class ParticipationPluginBA {
             createHistoricalEntry(value);
             set24hRewards(value);
             set24hStaking(value);
-            setLast12Month(value);
-            setRewardGrowthFor12Months(value);
-            setStakingGrowthFor12Months(value);
+            setEventTimeframe(value);
+            setRewardGrowthForLastMonths(value);
+            setStakingGrowthForLastMonths(value);
         }
     }
 
@@ -336,7 +343,7 @@ public class ParticipationPluginBA {
             value.getStaking().setSymbol(singleEventRootStatusResponseDO.getData().getStaking().getSymbol());
 
             value.getStaking().setFormattedStaked(unitConverter.convertToHigherUnit(value.getStaking()));
-            value.getStaking().setFormattedStaked(unitConverter.convertFromIotaToUnits(value.getStaking()));
+            value.getStaking().setFormattedStaked(unitConverter.convertIotaToHigherUnitsWithUnit(value.getStaking()));
             value.getStaking().setFormattedStaked(value.getStaking().getFormattedStaked() + " (" + String.format("%.0f", value.getStaking().getStaked() * 100f / IOTA_TOTAL_TOKEN) + "%)");
 
         }

@@ -31,13 +31,13 @@ public class SingleEventStakingEntity extends PanacheEntityBase {
     private String Rewarded24hInPercent;
     private String Staked24hInPercent;
     private String PercentColor;
-    private String last12Months;
+    private String eventTimeframe;
 
     @ElementCollection
-    private List<Long> rewardsLast12Months;
+    private List<Long> rewardsLastMonths;
 
     @ElementCollection
-    private List<Long> stakesLast12Months;
+    private List<Long> stakesLastMonths;
 
     private String monthWithoutRewards;
     private String monthWithoutStaking;
@@ -138,20 +138,20 @@ public class SingleEventStakingEntity extends PanacheEntityBase {
         Staked24hInPercent = staked24hInPercent;
     }
 
-    public String getLast12Months() {
-        return last12Months;
+    public String getEventTimeframe() {
+        return eventTimeframe;
     }
 
-    public void setLast12Months(String last12Months) {
-        this.last12Months = last12Months;
+    public void setEventTimeframe(String last12Months) {
+        this.eventTimeframe = last12Months;
     }
 
-    public List<Long> getRewardsLast12Months() {
-        return rewardsLast12Months;
+    public List<Long> getRewardsLastMonths() {
+        return rewardsLastMonths;
     }
 
-    public void setRewardsLast12Months(List<Long> rewardsLast12Months) {
-        this.rewardsLast12Months = rewardsLast12Months;
+    public void setRewardsLastMonths(List<Long> rewardsLast12Months) {
+        this.rewardsLastMonths = rewardsLast12Months;
     }
 
     public String getMonthWithoutRewards() {
@@ -162,12 +162,12 @@ public class SingleEventStakingEntity extends PanacheEntityBase {
         this.monthWithoutRewards = monthWithoutRewards;
     }
 
-    public List<Long> getStakesLast12Months() {
-        return stakesLast12Months;
+    public List<Long> getStakesLastMonths() {
+        return stakesLastMonths;
     }
 
-    public void setStakesLast12Months(List<Long> stakesLast12Months) {
-        this.stakesLast12Months = stakesLast12Months;
+    public void setStakesLastMonths(List<Long> stakesLast12Months) {
+        this.stakesLastMonths = stakesLast12Months;
     }
 
     public String getMonthWithoutStaking() {
