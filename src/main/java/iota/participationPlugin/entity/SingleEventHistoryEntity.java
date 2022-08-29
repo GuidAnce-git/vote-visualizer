@@ -16,7 +16,10 @@ import java.util.List;
 @NamedQueries({
         @NamedQuery(name = "SingleEventHistoryEntity.findRewardedByMonth", query = "SELECT s FROM SingleEventHistoryEntity s " +
                 "WHERE s.eventId = :eventId AND s.createdAt BETWEEN :startDate AND :endDate " +
-                "ORDER BY s.rewarded")
+                "ORDER BY s.rewarded"),
+        @NamedQuery(name = "SingleEventHistoryEntity.findStakedByMonth", query = "SELECT s FROM SingleEventHistoryEntity s " +
+                "WHERE s.eventId = :eventId AND s.createdAt BETWEEN :startDate AND :endDate " +
+                "ORDER BY s.staked")
 })
 public class SingleEventHistoryEntity extends PanacheEntityBase {
 
@@ -39,6 +42,11 @@ public class SingleEventHistoryEntity extends PanacheEntityBase {
     private LocalDateTime updatedAt;
 
     public static List<SingleEventHistoryEntity> findRewardedByMonth(String eventId, LocalDateTime startDate, LocalDateTime endDate) {
+        return find("#SingleEventHistoryEntity.findRewardedByMonth",
+                Parameters.with("eventId", eventId).and("startDate", startDate).and("endDate", endDate)).list();
+    }
+
+    public static List<SingleEventHistoryEntity> findStakedByMonth(String eventId, LocalDateTime startDate, LocalDateTime endDate) {
         return find("#SingleEventHistoryEntity.findRewardedByMonth",
                 Parameters.with("eventId", eventId).and("startDate", startDate).and("endDate", endDate)).list();
     }

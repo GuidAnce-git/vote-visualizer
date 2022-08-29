@@ -38,7 +38,9 @@ public class SingleEventDataEntity extends PanacheEntityBase {
     private String advancedName;
     private Long milestoneIndexCommence;
     private Long milestoneIndexStart;
+    private String milestoneIndexStartDate;
     private Long milestoneIndexEnd;
+    private String milestoneIndexEndDate;
     private Long milestoneIndex;
     @Column(length = 5120)
     private String additionalInfo;
@@ -192,5 +194,21 @@ public class SingleEventDataEntity extends PanacheEntityBase {
 
     public void setAdvancedName(String advancedName) {
         this.advancedName = advancedName;
+    }
+
+    public String getMilestoneIndexStartDate() {
+        return milestoneIndexStartDate;
+    }
+
+    public void setMilestoneIndexStartDate(String milestoneIndexStartDate) {
+        this.milestoneIndexStartDate = milestoneIndexStartDate;
+    }
+
+    public String getMilestoneIndexEndDate() {
+        return milestoneIndexEndDate;
+    }
+
+    public void setMilestoneIndexEndDate(String milestoneIndexEndDate) {
+        this.milestoneIndexEndDate = milestoneIndexEndDate;
     }
 }

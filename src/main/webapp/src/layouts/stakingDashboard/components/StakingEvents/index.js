@@ -11,14 +11,13 @@ import axios from "axios";
 import {DataGrid, GridColDef, GridRowsProp} from "@mui/x-data-grid";
 import MDBadge from "../../../../components/MDBadge";
 import ReportsLineChart from "../../../../examples/Charts/LineCharts/ReportsLineChart";
-import reportsLineChartData from "../../data/reportsLineChartData";
-
+import TimelineList from "../../../../examples/Timeline/TimelineList";
+import TimelineItem from "../../../../examples/Timeline/TimelineItem";
 
 export default function StakingEvents() {
     const [selectedItem, setSelectedItem] = useState([]);
     const [data, setData] = useState([]);
     const [pageSize, setPageSize] = React.useState(5);
-    const {sales, tasks} = reportsLineChartData;
 
 
     // load data from API
@@ -128,40 +127,41 @@ export default function StakingEvents() {
                                 {selectedItem.additionalInfo}
                             </MDTypography>
                         </MDBox>
+                        <MDBox pt={1} pb={2} px={2}>
+                            <MDTypography variant="h6" fontWeight="light">
+                                Checksum: {selectedItem.checksum} <br/>
+                                Event ID: {selectedItem.eventId}
+                            </MDTypography>
+                        </MDBox>
                     </Card>
                 </Grid>
                 <Grid item xs={12} md={5}>
-                    <Card id="information">
-                        <MDBox pt={3} px={2}>
-                            <MDTypography variant="h6" fontWeight="medium">
-                                Information
-                            </MDTypography>
-                        </MDBox>
-                        <MDBox pt={1} pb={2} px={2}>
-                            <MDTypography variant="h6" fontWeight="light">
-                                <table>
-                                    <tbody>
-                                    <tr>
-                                        <td>
-                                            Created at:
-                                        </td>
-                                        <td>
-                                            {selectedItem.createdAt}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Last update:
-                                        </td>
-                                        <td>
-                                            {selectedItem.updatedAt}
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </MDTypography>
-                        </MDBox>
-                    </Card>
+                    <TimelineList title="Timeline">
+                        <TimelineItem
+                            color="success"
+                            title={
+                                "Event started at " + (selectedItem.milestoneIndexStartDate ? selectedItem.milestoneIndexStartDate : "")
+                            }
+                            dateTime=""
+                            description={
+                                "Milestone Index Start: " + (selectedItem.milestoneIndexStart ? selectedItem.milestoneIndexStart : "")
+                            }
+                        />
+                        <TimelineItem
+                            color={
+                                selectedItem.eventEndsIn === "ended" ? "error" : "secondary"
+                            }
+                            title={
+                                (selectedItem.eventEndsIn === "ended" ? "Event ended on " : "Event will end on ") +
+                                (selectedItem.milestoneIndexEndDate ? selectedItem.milestoneIndexEndDate : "")
+                            }
+                            dateTime=""
+                            description={
+                                "Milestone Index End: " + (selectedItem.milestoneIndexEnd ? selectedItem.milestoneIndexEnd : "")
+                            }
+                            lastItem
+                        />
+                    </TimelineList>
                 </Grid>
             </Grid>
         </MDBox>
@@ -214,17 +214,17 @@ export default function StakingEvents() {
                         <ReportsLineChart
                             color="dark"
                             title="stake history"
-                            description={
-                                <>
-                                    (<strong>+15%</strong>) increase in today sales.
-                                </>
+                            description="Stake history for the last 12 months"
+                            date={
+                                selectedItem.staking && selectedItem.staking.monthWithoutStaking ?
+                                    "Months without data points: " + selectedItem.staking?.monthWithoutStaking :
+                                    ""
                             }
-                            date="updated 4 min ago"
                             chart={{
                                 labels: selectedItem.staking?.last12Months.split(","),
                                 datasets: {
-                                    label: "Mobile apps",
-                                    data: []
+                                    label: "IOTA staked",
+                                    data: selectedItem.staking?.stakesLast12Months
                                 }
                             }}
                         />
@@ -235,8 +235,12 @@ export default function StakingEvents() {
                         <ReportsLineChart
                             color="info"
                             title="reward history"
-                            description="Last Campaign Performance"
-                            date="campaign sent 2 days ago"
+                            description="Rewards history for the last 12 months"
+                            date={
+                                selectedItem.staking && selectedItem.staking.monthWithoutRewards ?
+                                    "Months without data points: " + selectedItem.staking?.monthWithoutRewards :
+                                    ""
+                            }
                             chart={{
                                 labels: selectedItem.staking?.last12Months.split(","),
                                 datasets: {

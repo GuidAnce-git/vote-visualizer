@@ -36,6 +36,12 @@ public class SingleEventStakingEntity extends PanacheEntityBase {
     @ElementCollection
     private List<Long> rewardsLast12Months;
 
+    @ElementCollection
+    private List<Long> stakesLast12Months;
+
+    private String monthWithoutRewards;
+    private String monthWithoutStaking;
+
     @JsonbDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -146,5 +152,29 @@ public class SingleEventStakingEntity extends PanacheEntityBase {
 
     public void setRewardsLast12Months(List<Long> rewardsLast12Months) {
         this.rewardsLast12Months = rewardsLast12Months;
+    }
+
+    public String getMonthWithoutRewards() {
+        return monthWithoutRewards;
+    }
+
+    public void setMonthWithoutRewards(String monthWithoutRewards) {
+        this.monthWithoutRewards = monthWithoutRewards;
+    }
+
+    public List<Long> getStakesLast12Months() {
+        return stakesLast12Months;
+    }
+
+    public void setStakesLast12Months(List<Long> stakesLast12Months) {
+        this.stakesLast12Months = stakesLast12Months;
+    }
+
+    public String getMonthWithoutStaking() {
+        return monthWithoutStaking;
+    }
+
+    public void setMonthWithoutStaking(String monthWithoutStaking) {
+        this.monthWithoutStaking = monthWithoutStaking;
     }
 }
