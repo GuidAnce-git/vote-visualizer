@@ -13,21 +13,20 @@
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
  */
 import Grid from "@mui/material/Grid";
-import MDBox from "../../components/MDBox";
-import DashboardLayout from "../../examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "../../examples/Navbars/DashboardNavbar";
-import Footer from "../../examples/Footer";
-import StakingEvents from "./components/StakingEvents";
+import MDBox from "../../../components/MDBox";
+import DashboardLayout from "../../../examples/LayoutContainers/DashboardLayout";
+import DashboardNavbar from "../../../examples/Navbars/DashboardNavbar";
+import Footer from "../../../examples/Footer";
+import VotingEvents from "./components/VotingEvents";
 
-function StakingDashboard() {
+function VotingDashboard() {
 
     return (
-
         <DashboardLayout>
             <DashboardNavbar/>
             <MDBox py={3}>
                 <Grid item xs={12} md={6} lg={12}>
-                    <StakingEvents/>
+                    <VotingEvents/>
                 </Grid>
             </MDBox>
             <Footer/>
@@ -35,4 +34,4 @@ function StakingDashboard() {
     );
 }
 
-export default StakingDashboard;
+export default VotingDashboard;

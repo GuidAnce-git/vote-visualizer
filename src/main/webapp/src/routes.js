@@ -36,8 +36,8 @@
  */
 
 // Material Dashboard 2 React layouts
-import VotingDashboard from "./layouts/votingDashboard";
-import StakingDashboard from "./layouts/stakingDashboard";
+import VotingDashboard from "./layouts/dashboards/votingDashboard";
+import StakingDashboard from "./layouts/dashboards/stakingDashboard";
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import HorizontalSplitIcon from '@mui/icons-material/HorizontalSplit';
 

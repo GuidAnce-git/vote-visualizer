@@ -1,18 +1,18 @@
-import MDBox from "../../../../components/MDBox";
-import MDTypography from "../../../../components/MDTypography";
+import MDBox from "../../../../../components/MDBox";
+import MDTypography from "../../../../../components/MDTypography";
 import Card from "@mui/material/Card";
 import React, {useEffect, useState} from "react";
 import Grid from "@mui/material/Grid";
-import ComplexStatisticsCard from "../../../../examples/Cards/StatisticsCards/ComplexStatisticsCard";
+import ComplexStatisticsCard from "../../../../../examples/Cards/StatisticsCards/ComplexStatisticsCard";
 import HorizontalSplitIcon from '@mui/icons-material/HorizontalSplit';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import axios from "axios";
 import {DataGrid, GridColDef, GridRowsProp} from "@mui/x-data-grid";
-import MDBadge from "../../../../components/MDBadge";
-import ReportsLineChart from "../../../../examples/Charts/LineCharts/ReportsLineChart";
-import TimelineList from "../../../../examples/Timeline/TimelineList";
-import TimelineItem from "../../../../examples/Timeline/TimelineItem";
+import MDBadge from "../../../../../components/MDBadge";
+import ReportsLineChart from "../../../../../examples/Charts/LineCharts/ReportsLineChart";
+import TimelineList from "../../../../../examples/Timeline/TimelineList";
+import TimelineItem from "../../../../../examples/Timeline/TimelineItem";
 
 export default function StakingEvents() {
     const [selectedItem, setSelectedItem] = useState([]);
@@ -47,7 +47,7 @@ export default function StakingEvents() {
             headerName: '',
             width: 50,
             renderCell: (params) =>
-                <img src={require('../../../../assets/images/small-logos/' + params.value)}
+                <img src={require('../../../../../assets/images/small-logos/' + params.value)}
                      height={35}
                      alt=""/>,
         },
@@ -81,7 +81,7 @@ export default function StakingEvents() {
                 <MDBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
                     <MDBox>
                         <MDTypography variant="h6" gutterBottom>
-                            IOTA Events
+                            IOTA Staking Events
                         </MDTypography>
                     </MDBox>
                 </MDBox>
