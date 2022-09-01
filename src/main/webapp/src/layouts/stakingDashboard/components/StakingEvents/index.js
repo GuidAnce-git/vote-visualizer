@@ -140,7 +140,7 @@ export default function StakingEvents() {
                         <TimelineItem
                             color="success"
                             title={
-                                "Event started at " + (selectedItem.milestoneIndexStartDate ? selectedItem.milestoneIndexStartDate : "")
+                                "Event start at " + (selectedItem.milestoneIndexStartDate ? selectedItem.milestoneIndexStartDate : "")
                             }
                             dateTime=""
                             description={
@@ -152,7 +152,7 @@ export default function StakingEvents() {
                                 selectedItem.eventEndsIn === "ended" ? "error" : "secondary"
                             }
                             title={
-                                (selectedItem.eventEndsIn === "ended" ? "Event ended on " : "Event will end on ") +
+                                (selectedItem.eventEndsIn === "ended" ? "Event end on " : "Event will end on ") +
                                 (selectedItem.milestoneIndexEndDate ? selectedItem.milestoneIndexEndDate : "")
                             }
                             dateTime=""
@@ -215,8 +215,8 @@ export default function StakingEvents() {
                             color="dark"
                             title="stake history"
                             description={
-                                selectedItem.staking?.rewardsLastMonths.length > 0 ?
-                                    "Stakes for the duration of the event of " + selectedItem.staking?.stakesLastMonths.length + " months" : ""
+                                selectedItem.staking?.stakesLastWeeks.length > 0 ?
+                                    "Stakes for the duration of the event of " + selectedItem.staking?.stakesLastWeeks.length + " weeks" : ""
                             }
                             date={
                                 selectedItem.staking && selectedItem.staking.monthWithoutStaking ?
@@ -224,10 +224,10 @@ export default function StakingEvents() {
                                     ""
                             }
                             chart={{
-                                labels: selectedItem.staking?.eventTimeframe.split(","),
+                                labels: selectedItem.staking?.eventTimeframeInWeeks.split(","),
                                 datasets: {
                                     label: "MIOTA staked",
-                                    data: selectedItem.staking?.stakesLastMonths
+                                    data: selectedItem.staking?.stakesLastWeeks
                                 }
                             }}
                         />
@@ -239,8 +239,8 @@ export default function StakingEvents() {
                             color="info"
                             title="reward history"
                             description={
-                                selectedItem.staking?.rewardsLastMonths.length > 0 ?
-                                    "Rewards for the duration of the event of " + selectedItem.staking?.rewardsLastMonths.length + " months" : ""
+                                selectedItem.staking?.rewardsLastWeeks.length > 0 ?
+                                    "Rewards for the duration of the event of " + selectedItem.staking?.rewardsLastWeeks.length + " weeks" : ""
                             }
                             date={
                                 selectedItem.staking && selectedItem.staking.monthWithoutRewards ?
@@ -248,10 +248,10 @@ export default function StakingEvents() {
                                     ""
                             }
                             chart={{
-                                labels: selectedItem.staking?.eventTimeframe.split(","),
+                                labels: selectedItem.staking?.eventTimeframeInWeeks.split(","),
                                 datasets: {
                                     label: "ASMB rewarded",
-                                    data: selectedItem.staking?.rewardsLastMonths
+                                    data: selectedItem.staking?.rewardsLastWeeks
                                 }
                             }}
                         />

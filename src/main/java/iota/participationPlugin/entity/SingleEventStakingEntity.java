@@ -31,13 +31,21 @@ public class SingleEventStakingEntity extends PanacheEntityBase {
     private String Rewarded24hInPercent;
     private String Staked24hInPercent;
     private String PercentColor;
-    private String eventTimeframe;
+    private String eventTimeframeInMonths;
+    private String eventTimeframeInWeeks;
+
 
     @ElementCollection
     private List<Long> rewardsLastMonths;
 
     @ElementCollection
     private List<Long> stakesLastMonths;
+
+    @ElementCollection
+    private List<Long> rewardsLastWeeks;
+
+    @ElementCollection
+    private List<Long> stakesLastWeeks;
 
     private String monthWithoutRewards;
     private String monthWithoutStaking;
@@ -138,12 +146,12 @@ public class SingleEventStakingEntity extends PanacheEntityBase {
         Staked24hInPercent = staked24hInPercent;
     }
 
-    public String getEventTimeframe() {
-        return eventTimeframe;
+    public String getEventTimeframeInMonths() {
+        return eventTimeframeInMonths;
     }
 
-    public void setEventTimeframe(String last12Months) {
-        this.eventTimeframe = last12Months;
+    public void setEventTimeframeInMonths(String last12Months) {
+        this.eventTimeframeInMonths = last12Months;
     }
 
     public List<Long> getRewardsLastMonths() {
@@ -176,5 +184,29 @@ public class SingleEventStakingEntity extends PanacheEntityBase {
 
     public void setMonthWithoutStaking(String monthWithoutStaking) {
         this.monthWithoutStaking = monthWithoutStaking;
+    }
+
+    public String getEventTimeframeInWeeks() {
+        return eventTimeframeInWeeks;
+    }
+
+    public void setEventTimeframeInWeeks(String eventTimeframeInWeeks) {
+        this.eventTimeframeInWeeks = eventTimeframeInWeeks;
+    }
+
+    public List<Long> getRewardsLastWeeks() {
+        return rewardsLastWeeks;
+    }
+
+    public void setRewardsLastWeeks(List<Long> rewardsLastWeeks) {
+        this.rewardsLastWeeks = rewardsLastWeeks;
+    }
+
+    public List<Long> getStakesLastWeeks() {
+        return stakesLastWeeks;
+    }
+
+    public void setStakesLastWeeks(List<Long> stakesLastWeeks) {
+        this.stakesLastWeeks = stakesLastWeeks;
     }
 }

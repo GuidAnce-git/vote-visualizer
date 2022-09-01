@@ -3,6 +3,7 @@ package iota.participationPlugin.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.panache.common.Parameters;
+import iota.participationPlugin.control.EventTypeEnum;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -14,10 +15,10 @@ import java.util.List;
 
 @Entity
 @NamedQueries({
-        @NamedQuery(name = "SingleEventHistoryEntity.findRewardedByMonth", query = "SELECT s FROM SingleEventHistoryEntity s " +
+        @NamedQuery(name = "SingleEventHistoryEntity.findRewardedByDate", query = "SELECT s FROM SingleEventHistoryEntity s " +
                 "WHERE s.eventId = :eventId AND s.createdAt BETWEEN :startDate AND :endDate " +
                 "ORDER BY s.rewarded"),
-        @NamedQuery(name = "SingleEventHistoryEntity.findStakedByMonth", query = "SELECT s FROM SingleEventHistoryEntity s " +
+        @NamedQuery(name = "SingleEventHistoryEntity.findStakedByDate", query = "SELECT s FROM SingleEventHistoryEntity s " +
                 "WHERE s.eventId = :eventId AND s.createdAt BETWEEN :startDate AND :endDate " +
                 "ORDER BY s.staked")
 })
@@ -41,14 +42,17 @@ public class SingleEventHistoryEntity extends PanacheEntityBase {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public static List<SingleEventHistoryEntity> findRewardedByMonth(String eventId, LocalDateTime startDate, LocalDateTime endDate) {
-        return find("#SingleEventHistoryEntity.findRewardedByMonth",
-                Parameters.with("eventId", eventId).and("startDate", startDate).and("endDate", endDate)).list();
-    }
 
-    public static List<SingleEventHistoryEntity> findStakedByMonth(String eventId, LocalDateTime startDate, LocalDateTime endDate) {
-        return find("#SingleEventHistoryEntity.findRewardedByMonth",
-                Parameters.with("eventId", eventId).and("startDate", startDate).and("endDate", endDate)).list();
+    public static List<SingleEventHistoryEntity> findEntriesByDate(String type, String eventId, LocalDateTime startDate, LocalDateTime endDate) {
+        if (type.equals(EventTypeEnum.REWARD.getName())) {
+            return find("#SingleEventHistoryEntity.findRewardedByDate",
+                    Parameters.with("eventId", eventId).and("startDate", startDate).and("endDate", endDate)).list();
+        }
+        if (type.equals(EventTypeEnum.STAKE.getName())) {
+            return find("#SingleEventHistoryEntity.findStakedByDate",
+                    Parameters.with("eventId", eventId).and("startDate", startDate).and("endDate", endDate)).list();
+        }
+        return null;
     }
 
     public Long getId() {

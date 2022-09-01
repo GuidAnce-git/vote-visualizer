@@ -15,12 +15,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
-import java.time.LocalDate;
-import java.time.Period;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 
 /**
@@ -104,7 +105,7 @@ public class ParticipationPluginBA {
         }
     }
 
-    private static void setEventTimeframe(SingleEventDataEntity value) {
+    private static void setEventTimeframeInMonths(SingleEventDataEntity value) {
         List<String> lastMonths = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         LocalDate startDate = LocalDate.parse(value.getMilestoneIndexStartDate(), formatter).withDayOfMonth(1);
@@ -116,7 +117,27 @@ public class ParticipationPluginBA {
         }
 
         if (value.getStaking() != null) {
-            value.getStaking().setEventTimeframe(String.join(",", lastMonths));
+            value.getStaking().setEventTimeframeInMonths(String.join(",", lastMonths));
+        }
+    }
+
+    private static void setEventTimeframeInWeeks(SingleEventDataEntity value) {
+        List<Integer> lastWeeks = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        LocalDate startDate = LocalDate.parse(value.getMilestoneIndexStartDate(), formatter);
+        LocalDate endDate = LocalDate.parse(value.getMilestoneIndexEndDate(), formatter);
+        long weeksBetween = ChronoUnit.WEEKS.between(startDate, endDate);
+
+        for (int i = 0; i < weeksBetween + 1; i++) {
+            ZoneId defaultZoneId = ZoneId.systemDefault();
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(Date.from(startDate.plusWeeks(i).atStartOfDay(defaultZoneId).toInstant()));
+            int week = cal.get(Calendar.WEEK_OF_YEAR);
+            lastWeeks.add(week);
+        }
+
+        if (value.getStaking() != null) {
+            value.getStaking().setEventTimeframeInWeeks(lastWeeks.stream().map(String::valueOf).collect(Collectors.joining(",")));
         }
     }
 
@@ -130,7 +151,7 @@ public class ParticipationPluginBA {
             Period diff = Period.between(startDate, endDate);
 
             for (int i = 0; i < diff.getMonths() + 1; i++) {
-                List<Long> rewardsPerDay = SingleEventHistoryEntity.findRewardedByMonth(singleEventDataEntity.getEventId(), startDate.plusMonths(i).withDayOfMonth(1).atStartOfDay(), startDate.plusMonths(i).withDayOfMonth(startDate.plusMonths(i).lengthOfMonth()).atStartOfDay()).stream().map(SingleEventHistoryEntity::getRewarded).toList();
+                List<Long> rewardsPerDay = SingleEventHistoryEntity.findEntriesByDate(EventTypeEnum.REWARD.getName(), singleEventDataEntity.getEventId(), startDate.plusMonths(i).withDayOfMonth(1).atStartOfDay(), startDate.plusMonths(i).withDayOfMonth(startDate.plusMonths(i).lengthOfMonth()).atStartOfDay()).stream().map(SingleEventHistoryEntity::getRewarded).toList();
                 if (!rewardsPerDay.isEmpty()) {
                     resultList.add(unitConverter.getConvertedASMB(singleEventDataEntity.getStaking(), rewardsPerDay.get(rewardsPerDay.size() - 1) - rewardsPerDay.get(0)));
                 } else {
@@ -149,6 +170,79 @@ public class ParticipationPluginBA {
         }
     }
 
+    private void setRewardGrowthForLastWeeks(SingleEventDataEntity singleEventDataEntity) {
+        List<Long> resultList = new ArrayList<>();
+        if (!singleEventDataEntity.getStatus().equals(StatusEnum.ENDED.getName())) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+            LocalDate startDate = LocalDate.parse(singleEventDataEntity.getMilestoneIndexStartDate(), formatter);
+            LocalDate endDate = LocalDate.parse(singleEventDataEntity.getMilestoneIndexEndDate(), formatter);
+            long weeksBetween = ChronoUnit.WEEKS.between(startDate, endDate);
+            Calendar cal = Calendar.getInstance();
+            ZoneId defaultZoneId = ZoneId.systemDefault();
+
+            for (int i = 0; i < weeksBetween + 1; i++) {
+                Date date = Date.from(startDate.plusWeeks(i).atStartOfDay(defaultZoneId).toInstant());
+                cal.setTime(date);
+                cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                LocalDateTime weekStartDate = cal.getTime().toInstant().atZone(defaultZoneId).toLocalDateTime();
+                cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+                LocalDateTime weekEndDate = cal.getTime().toInstant().atZone(defaultZoneId).toLocalDate().atTime(LocalTime.MAX).truncatedTo(ChronoUnit.MINUTES);
+
+                List<Long> rewardsPerDay = Objects.requireNonNull(SingleEventHistoryEntity.findEntriesByDate(
+                        EventTypeEnum.REWARD.getName(),
+                        singleEventDataEntity.getEventId(),
+                        weekStartDate,
+                        weekEndDate
+                )).stream().map(SingleEventHistoryEntity::getRewarded).toList();
+
+                if (!rewardsPerDay.isEmpty()) {
+                    resultList.add(unitConverter.getConvertedASMB(singleEventDataEntity.getStaking(), rewardsPerDay.get(rewardsPerDay.size() - 1) - rewardsPerDay.get(0)));
+                } else {
+                    //no data available
+                    resultList.add(0L);
+                }
+            }
+            singleEventDataEntity.getStaking().setRewardsLastWeeks(resultList);
+        }
+    }
+
+    private void setStakingGrowthForLastWeeks(SingleEventDataEntity singleEventDataEntity) {
+        List<Long> resultList = new ArrayList<>();
+        if (!singleEventDataEntity.getStatus().equals(StatusEnum.ENDED.getName())) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+            LocalDate startDate = LocalDate.parse(singleEventDataEntity.getMilestoneIndexStartDate(), formatter);
+            LocalDate endDate = LocalDate.parse(singleEventDataEntity.getMilestoneIndexEndDate(), formatter);
+            long weeksBetween = ChronoUnit.WEEKS.between(startDate, endDate);
+
+            Calendar cal = Calendar.getInstance();
+            ZoneId defaultZoneId = ZoneId.systemDefault();
+
+            for (int i = 0; i < weeksBetween + 1; i++) {
+                Date date = Date.from(startDate.plusWeeks(i).atStartOfDay(defaultZoneId).toInstant());
+                cal.setTime(date);
+                cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                LocalDateTime weekStartDate = cal.getTime().toInstant().atZone(defaultZoneId).toLocalDateTime();
+                cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+                LocalDateTime weekEndDate = cal.getTime().toInstant().atZone(defaultZoneId).toLocalDate().atTime(LocalTime.MAX).truncatedTo(ChronoUnit.MINUTES);
+
+                List<Long> stakesPerDay = Objects.requireNonNull(SingleEventHistoryEntity.findEntriesByDate(
+                        EventTypeEnum.STAKE.getName(),
+                        singleEventDataEntity.getEventId(),
+                        weekStartDate,
+                        weekEndDate
+                )).stream().map(SingleEventHistoryEntity::getStaked).toList();
+
+                if (!stakesPerDay.isEmpty()) {
+                    resultList.add(unitConverter.convertIotaToMiota(stakesPerDay.get(stakesPerDay.size() - 1) - stakesPerDay.get(0)));
+                } else {
+                    //no data available
+                    resultList.add(0L);
+                }
+            }
+            singleEventDataEntity.getStaking().setStakesLastWeeks(resultList);
+        }
+    }
+
     private void setStakingGrowthForLastMonths(SingleEventDataEntity singleEventDataEntity) {
         List<Long> resultList = new ArrayList<>();
         List<String> notAvailableMonths = new ArrayList<>();
@@ -159,7 +253,7 @@ public class ParticipationPluginBA {
             Period diff = Period.between(startDate, endDate);
 
             for (int i = 0; i < diff.getMonths() + 1; i++) {
-                List<Long> stakesPerDay = SingleEventHistoryEntity.findStakedByMonth(singleEventDataEntity.getEventId(), startDate.plusMonths(i).withDayOfMonth(1).atStartOfDay(), startDate.plusMonths(i).withDayOfMonth(startDate.plusMonths(i).lengthOfMonth()).atStartOfDay()).stream().map(SingleEventHistoryEntity::getStaked).toList();
+                List<Long> stakesPerDay = SingleEventHistoryEntity.findEntriesByDate(EventTypeEnum.STAKE.getName(), singleEventDataEntity.getEventId(), startDate.plusMonths(i).withDayOfMonth(1).atStartOfDay(), startDate.plusMonths(i).withDayOfMonth(startDate.plusMonths(i).lengthOfMonth()).atStartOfDay()).stream().map(SingleEventHistoryEntity::getStaked).toList();
                 if (!stakesPerDay.isEmpty()) {
                     resultList.add(unitConverter.convertIotaToMiota(stakesPerDay.get(stakesPerDay.size() - 1) - stakesPerDay.get(0)));
                 } else {
@@ -287,9 +381,12 @@ public class ParticipationPluginBA {
             createHistoricalEntry(value);
             set24hRewards(value);
             set24hStaking(value);
-            setEventTimeframe(value);
+            setEventTimeframeInMonths(value);
+            setEventTimeframeInWeeks(value);
             setRewardGrowthForLastMonths(value);
             setStakingGrowthForLastMonths(value);
+            setRewardGrowthForLastWeeks(value);
+            setStakingGrowthForLastWeeks(value);
         }
     }
 
