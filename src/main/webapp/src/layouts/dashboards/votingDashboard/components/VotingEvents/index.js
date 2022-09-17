@@ -8,13 +8,13 @@ import axios from "axios";
 import {DataGrid, GridColDef, GridRowsProp} from "@mui/x-data-grid";
 import TimelineList from "../../../../../examples/Timeline/TimelineList";
 import TimelineItem from "../../../../../examples/Timeline/TimelineItem";
+import DefaultDoughnutChart from "../../../../../examples/Charts/DoughnutCharts/DefaultDoughnutChart";
 
 
 export default function VotingEvents() {
     const [selectedItem, setSelectedItem] = useState([]);
     const [data, setData] = useState([]);
     const [pageSize, setPageSize] = React.useState(5);
-
 
     // load data from API
     useEffect(() => {
@@ -64,6 +64,37 @@ export default function VotingEvents() {
                 </MDBox>
         },
     ];
+
+    function getQuestion() {
+        return <>
+            {selectedItem.payload?.questions?.map(function (object, i) {
+                return <MDBox>
+                    <MDBox pt={1} pb={2} px={2}>
+                        <MDTypography variant="h6" fontWeight="light">
+                            {object.text}
+                        </MDTypography>
+                    </MDBox>
+                    {getAnswers(object)}
+                </MDBox>
+
+
+            })}
+        </>;
+    }
+
+    function getAnswers(object) {
+        return <>
+            {object.answers?.map(function (answer, i) {
+                return <MDBox pt={1} pb={2} px={2} key={i}>
+                    <MDTypography variant="h6" fontWeight="light">
+                        <u>{answer.text}</u><br/>
+                        {answer.additionalInfo}
+                    </MDTypography>
+                </MDBox>;
+            })}
+        </>;
+    }
+
 
     return (
         <Grid item xs={12} md={6} lg={12}>
@@ -156,6 +187,57 @@ export default function VotingEvents() {
                     </Grid>
                 </Grid>
             </MDBox>
+            <MDBox mb={3} mt={4.5}>
+                <Grid container spacing={3}>
+                    <Grid item xs={12} md={12}>
+                        <Card id="description">
+                            <MDBox pt={3} px={2}>
+                                <MDTypography variant="h6" fontWeight="medium">
+                                    Question
+                                </MDTypography>
+                            </MDBox>
+                            {getQuestion()}
+                        </Card>
+                    </Grid>
+                </Grid>
+            </MDBox>
+            <MDBox mb={3} mt={4.5}>
+                <Grid container spacing={3}>
+                    <Grid item xs={12} md={6}>
+                        <Card id="description">
+                            <DefaultDoughnutChart
+                                title="Voting Result"
+                                description="current answers"
+                                chart={{
+                                    labels: ["Build", "Burn"],
+                                    datasets: {
+                                        label: "Projects",
+                                        backgroundColors: ["info", "dark", "error", "secondary", "primary"],
+                                        data: [372250343375, 74402847655],
+                                    },
+                                }}
+                            />
+                        </Card>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                        <Card id="description">
+                            <DefaultDoughnutChart
+                                title="Voting Result"
+                                description="current answers in percent"
+                                chart={{
+                                    labels: ["Build", "Burn"],
+                                    datasets: {
+                                        label: "Projects",
+                                        backgroundColors: ["info", "dark", "error", "secondary", "primary"],
+                                        data: [80, 20],
+                                    },
+                                }}
+                            />
+                        </Card>
+                    </Grid>
+                </Grid>
+            </MDBox>
         </Grid>
     );
 }
+
