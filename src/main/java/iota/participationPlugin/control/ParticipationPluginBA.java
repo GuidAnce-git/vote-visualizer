@@ -47,12 +47,9 @@ public class ParticipationPluginBA {
     EntityManager entityManager;
 
     @Inject
-    NodeBA nodeBA;
-
-    @Inject
     Logger LOG;
 
-    private static void calcDuration(SingleEventDataEntity value) {
+    private void calcDuration(SingleEventDataEntity value) {
         if (!StatusEnum.ENDED.getName().equals(value.getStatus())) {
             long secondsToEnd = (value.getMilestoneIndexEnd() - value.getMilestoneIndex()) * TIME_BETWEEN_MILESTONES;
             if (secondsToEnd <= TimeUnit.DAYS.toSeconds(1)) {
@@ -65,7 +62,7 @@ public class ParticipationPluginBA {
         }
     }
 
-    private static void setIcon(SingleEventDataEntity value) {
+    private void setIcon(SingleEventDataEntity value) {
         if (value.getStaking() != null && IotaSymbolsEnum.MICRO_ASMB.getName().equals(value.getStaking().getSymbol())) {
             value.setIcon(IotaSymbolsEnum.MICRO_ASMB.getLogo());
         }
@@ -74,7 +71,7 @@ public class ParticipationPluginBA {
         }
     }
 
-    private static void setAdvancedName(SingleEventDataEntity value) {
+    private void setAdvancedName(SingleEventDataEntity value) {
         if (value.getPayload() != null && value.getPayload().getText() != null) {
             value.setAdvancedName(value.getPayload().getText());
         } else {
@@ -82,7 +79,7 @@ public class ParticipationPluginBA {
         }
     }
 
-    private static void createHistoricalEntry(SingleEventDataEntity value) {
+    private void createHistoricalEntry(SingleEventDataEntity value) {
         if (!StatusEnum.ENDED.getName().equals(value.getStatus()) && value.getStaking() != null) {
             SingleEventHistoryEntity singleEventHistoryEntity = new SingleEventHistoryEntity();
             singleEventHistoryEntity.setEventId(value.getEventId());
@@ -93,7 +90,7 @@ public class ParticipationPluginBA {
 
     }
 
-    private static void setColor(SingleEventDataEntity value, Double growth) {
+    private void setColor(SingleEventDataEntity value, Double growth) {
         if ((100.0d - growth) > 0.0d) {
             value.getStaking().setPercentColor("success");
         }
@@ -105,7 +102,7 @@ public class ParticipationPluginBA {
         }
     }
 
-    private static void setEventTimeframeInMonths(SingleEventDataEntity value) {
+    private void setEventTimeframeInMonths(SingleEventDataEntity value) {
         List<String> lastMonths = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         LocalDate startDate = LocalDate.parse(value.getMilestoneIndexStartDate(), formatter).withDayOfMonth(1);
@@ -121,7 +118,7 @@ public class ParticipationPluginBA {
         }
     }
 
-    private static void setEventTimeframeInWeeks(SingleEventDataEntity value) {
+    private void setEventTimeframeInWeeks(SingleEventDataEntity value) {
         List<Integer> lastWeeks = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         LocalDate startDate = LocalDate.parse(value.getMilestoneIndexStartDate(), formatter);
@@ -273,22 +270,32 @@ public class ParticipationPluginBA {
     }
 
     private Double getRewardGrowth(String eventId) {
-        Query query = entityManager.createNativeQuery("WITH cte AS (SELECT rewarded, ABS(EXTRACT(EPOCH FROM (SELECT createdat - (SELECT MAX(createdat) - INTERVAL '1 day' FROM singleeventhistoryentity)))) AS secs_from_prev_timestamp FROM singleeventhistoryentity WHERE eventid like :eventId) SELECT rewarded / (SELECT rewarded FROM singleeventhistoryentity WHERE eventid like :eventId AND createdat = (SELECT MAX(createdat) FROM singleeventhistoryentity)) * 100.0 AS percentage_difference FROM cte WHERE secs_from_prev_timestamp = (SELECT MIN(secs_from_prev_timestamp) FROM cte)");
-        query.setParameter("eventId", eventId);
-        if (!query.getResultList().isEmpty()) {
-            return (Double) query.getResultList().get(0);
+        Instant fromDate = Instant.now().minus(Duration.ofHours(24));
+        Query queryFirstValue = entityManager.createNativeQuery("SELECT rewarded FROM singleeventhistoryentity WHERE eventid like :eventId AND createdat >= :fromDate ORDER BY createdat LIMIT 1");
+        queryFirstValue.setParameter("eventId", eventId).setParameter("fromDate", fromDate);
+        Query queryLastValue = entityManager.createNativeQuery("SELECT rewarded FROM singleeventhistoryentity WHERE eventid like :eventId AND createdat >= :fromDate ORDER BY createdat DESC LIMIT 1");
+        return getPercentValue(eventId, fromDate, queryFirstValue, queryLastValue);
+    }
+
+    private Double getStakedGrowth(String eventId) {
+        Instant fromDate = Instant.now().minus(Duration.ofHours(24));
+        Query queryFirstValue = entityManager.createNativeQuery("SELECT staked FROM singleeventhistoryentity WHERE eventid like :eventId AND createdat >= :fromDate ORDER BY createdat LIMIT 1");
+        queryFirstValue.setParameter("eventId", eventId).setParameter("fromDate", fromDate);
+        Query queryLastValue = entityManager.createNativeQuery("SELECT staked FROM singleeventhistoryentity WHERE eventid like :eventId AND createdat >= :fromDate ORDER BY createdat DESC LIMIT 1");
+        return getPercentValue(eventId, fromDate, queryFirstValue, queryLastValue);
+    }
+
+    private Double getPercentValue(String eventId, Instant fromDate, Query queryFirstValue, Query queryLastValue) {
+        queryLastValue.setParameter("eventId", eventId).setParameter("fromDate", fromDate);
+
+        if (!queryLastValue.getResultList().isEmpty() && !queryLastValue.getResultList().isEmpty()) {
+            Double lastValue = Double.valueOf(queryLastValue.getResultList().get(0).toString());
+            Double firstValue = Double.valueOf(queryFirstValue.getResultList().get(0).toString());
+            return ((firstValue / lastValue)) * 100;
         }
         return 100.0d;
     }
 
-    private Double getStakedGrowth(String eventId) {
-        Query query = entityManager.createNativeQuery("WITH cte AS (SELECT staked, ABS(EXTRACT(EPOCH FROM (SELECT createdat - (SELECT MAX(createdat) - INTERVAL '1 day' FROM singleeventhistoryentity)))) AS secs_from_prev_timestamp FROM singleeventhistoryentity WHERE eventid like :eventId) SELECT staked / (SELECT staked FROM singleeventhistoryentity WHERE eventid like :eventId AND createdat = (SELECT MAX(createdat) FROM singleeventhistoryentity)) * 100.0 AS percentage_difference FROM cte WHERE secs_from_prev_timestamp = (SELECT MIN(secs_from_prev_timestamp) FROM cte)");
-        query.setParameter("eventId", eventId);
-        if (!query.getResultList().isEmpty()) {
-            return (Double) query.getResultList().get(0);
-        }
-        return 100.0d;
-    }
 
     /**
      * Get all event IDs.
@@ -319,7 +326,7 @@ public class ParticipationPluginBA {
         for (SingleEventDataEntity value : singleEventDataEntityList) {
             SingleEventRootResponseDO singleEventRootResponse = participationPluginService.getSingleParticipationEvent(value.getEventId());
 
-            LOG.info("setting root data information");
+            LOG.info("setting root data information for EventID " + value.getEventId());
             value.setName(singleEventRootResponse.getData().getName());
             value.setMilestoneIndexCommence(singleEventRootResponse.getData().getMilestoneIndexCommence());
             value.setMilestoneIndexStart(singleEventRootResponse.getData().getMilestoneIndexStart());
@@ -329,10 +336,9 @@ public class ParticipationPluginBA {
             value.setAdditionalInfo(singleEventRootResponse.getData().getAdditionalInfo());
 
             if (value.getPayload() == null) {
-                LOG.info("Payload NULL. Setting new one");
                 value.setPayload(new SingleEventPayloadEntity());
             }
-            LOG.info("Adding payload data");
+            LOG.info("Adding payload data for EventID " + value.getEventId());
             value.getPayload().setType(singleEventRootResponse.getData().getPayload().getType());
             value.getPayload().setText(singleEventRootResponse.getData().getPayload().getText());
             value.getPayload().setSymbol(singleEventRootResponse.getData().getPayload().getSymbol());
@@ -342,10 +348,10 @@ public class ParticipationPluginBA {
             value.getPayload().setAdditionalInfo(singleEventRootResponse.getData().getPayload().getAdditionalInfo());
 
             if (singleEventRootResponse.getData().getPayload().getQuestions() != null) {
-                LOG.info("question/answer NULL. Setting new one");
                 if (value.getPayload().getQuestions() == null) {
                     value.getPayload().setQuestions(new HashSet<>());
                 }
+                LOG.info("Adding Questions data for EventID " + value.getEventId());
                 for (SingleEventQuestionResponseDO singleEventQuestionResponseDO : singleEventRootResponse.getData().getPayload().getQuestions()) {
                     if (!value.getPayload().getQuestions().isEmpty()) {
                         for (SingleEventQuestionsEntity questionValue : value.getPayload().getQuestions()) {
@@ -369,6 +375,7 @@ public class ParticipationPluginBA {
     private void getAllEventsStatus(List<SingleEventDataEntity> singleEventDataEntityList) {
         LOG.info("Trying to enrich all events with new status data");
         for (SingleEventDataEntity value : singleEventDataEntityList) {
+            LOG.info("Enrich Event " + value.getEventId());
             SingleEventRootStatusResponseDO singleEventRootStatusResponseDO = participationPluginService.getParticipationEventStatus(value.getEventId());
             value.setMilestoneIndex(singleEventRootStatusResponseDO.getData().getMilestoneIndex());
             value.setStatus(singleEventRootStatusResponseDO.getData().getStatus());
@@ -434,15 +441,14 @@ public class ParticipationPluginBA {
                 LOG.info("Staking NULL. Setting new one");
                 value.setStaking(new SingleEventStakingEntity());
             }
-            LOG.info("Adding staking data");
+            LOG.info("Adding staking data for Event " + value.getEventId());
             value.getStaking().setStaked(singleEventRootStatusResponseDO.getData().getStaking().getStaked());
             value.getStaking().setRewarded(singleEventRootStatusResponseDO.getData().getStaking().getRewarded());
             value.getStaking().setSymbol(singleEventRootStatusResponseDO.getData().getStaking().getSymbol());
 
-            value.getStaking().setFormattedStaked(unitConverter.convertToHigherUnit(value.getStaking()));
+            value.getStaking().setFormattedReward(unitConverter.convertToHigherUnit(value.getStaking()));
             value.getStaking().setFormattedStaked(unitConverter.convertIotaToHigherUnitsWithUnit(value.getStaking()));
             value.getStaking().setFormattedStaked(value.getStaking().getFormattedStaked() + " (" + String.format("%.0f", value.getStaking().getStaked() * 100f / IOTA_TOTAL_TOKEN) + "%)");
-
         }
     }
 

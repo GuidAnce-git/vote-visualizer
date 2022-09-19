@@ -18,7 +18,7 @@ export default function VotingEvents() {
 
     // load data from API
     useEffect(() => {
-        axios("http://localhost:8080/test/voting")
+        axios(process.env.REACT_APP_API_URL + "/voting")
             .then((res) => {
                 setData(res.data);
             })

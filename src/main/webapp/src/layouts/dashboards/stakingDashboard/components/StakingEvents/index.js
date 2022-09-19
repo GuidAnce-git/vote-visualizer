@@ -22,7 +22,7 @@ export default function StakingEvents() {
 
     // load data from API
     useEffect(() => {
-        axios("http://localhost:8080/test/staking")
+        axios(process.env.REACT_APP_API_URL + "/staking")
             .then((res) => {
                 setData(res.data);
             })
