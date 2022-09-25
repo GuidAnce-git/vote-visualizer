@@ -8,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.json.bind.annotation.JsonbDateFormat;
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 
@@ -35,6 +36,11 @@ public class SingleEventQuestionsEntity extends PanacheEntityBase {
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn
     private Set<SingleEventAnswersEntity> answers;
+
+    @ElementCollection
+    private List<String> listOfAnswers;
+    @ElementCollection
+    private List<Long> votesInPercent;
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
@@ -82,5 +88,21 @@ public class SingleEventQuestionsEntity extends PanacheEntityBase {
 
     public void setAnswers(Set<SingleEventAnswersEntity> answers) {
         this.answers = answers;
+    }
+
+    public List<String> getListOfAnswers() {
+        return listOfAnswers;
+    }
+
+    public void setListOfAnswers(List<String> listOfAnswers) {
+        this.listOfAnswers = listOfAnswers;
+    }
+
+    public List<Long> getVotesInPercent() {
+        return votesInPercent;
+    }
+
+    public void setVotesInPercent(List<Long> votesInPercent) {
+        this.votesInPercent = votesInPercent;
     }
 }

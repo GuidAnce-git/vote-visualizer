@@ -40,6 +40,8 @@ import VotingDashboard from "./layouts/dashboards/votingDashboard";
 import StakingDashboard from "./layouts/dashboards/stakingDashboard";
 import HowToVoteIcon from '@mui/icons-material/HowToVote';
 import HorizontalSplitIcon from '@mui/icons-material/HorizontalSplit';
+import TollIcon from '@mui/icons-material/Toll';
+import ColoredCoinsDashboard from "./layouts/dashboards/coloredCoinsDashboard";
 
 const routes = [
     {
@@ -57,6 +59,14 @@ const routes = [
         icon: <HowToVoteIcon fontSize="small"/>,
         route: "/votingDashboard",
         component: <VotingDashboard/>,
+    },
+    {
+        type: "collapse",
+        name: "Colored Coins (Test Net)",
+        key: "coloredCoins",
+        icon: <TollIcon fontSize="small"/>,
+        route: "/coloredCoins",
+        component: <ColoredCoinsDashboard/>,
     },
 ];
 

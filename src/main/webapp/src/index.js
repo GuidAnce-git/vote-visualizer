@@ -11,15 +11,15 @@
 
 import React from "react";
 import ReactDOM from "react-dom";
-import {BrowserRouter} from "react-router-dom";
 import App from "./App";
 import {MaterialUIControllerProvider} from "./context";
 import {DevSupport} from "@react-buddy/ide-toolbox";
 import {ComponentPreviews, useInitial} from "./dev";
+import {HashRouter} from "react-router-dom";
 
 
 ReactDOM.render(
-    <BrowserRouter>
+    <HashRouter>
         <MaterialUIControllerProvider>
             <DevSupport ComponentPreviews={ComponentPreviews}
                         useInitialHook={useInitial}
@@ -27,6 +27,6 @@ ReactDOM.render(
                 <App/>
             </DevSupport>
         </MaterialUIControllerProvider>
-    </BrowserRouter>,
+    </HashRouter>,
     document.getElementById("root")
 );

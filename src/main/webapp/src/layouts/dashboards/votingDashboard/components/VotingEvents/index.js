@@ -207,29 +207,13 @@ export default function VotingEvents() {
                         <Card id="description">
                             <DefaultDoughnutChart
                                 title="Voting Result"
-                                description="current answers"
-                                chart={{
-                                    labels: ["Build", "Burn"],
-                                    datasets: {
-                                        label: "Projects",
-                                        backgroundColors: ["info", "dark", "error", "secondary", "primary"],
-                                        data: [372250343375, 74402847655],
-                                    },
-                                }}
-                            />
-                        </Card>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <Card id="description">
-                            <DefaultDoughnutChart
-                                title="Voting Result"
                                 description="current answers in percent"
                                 chart={{
-                                    labels: ["Build", "Burn"],
+                                    labels: selectedItem.payload?.questions[0].listOfAnswers,
                                     datasets: {
                                         label: "Projects",
                                         backgroundColors: ["info", "dark", "error", "secondary", "primary"],
-                                        data: [80, 20],
+                                        data: selectedItem.payload?.questions[0].votesInPercent,
                                     },
                                 }}
                             />

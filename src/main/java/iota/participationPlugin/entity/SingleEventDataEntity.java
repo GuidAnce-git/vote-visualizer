@@ -15,7 +15,7 @@ import java.util.List;
 @Entity
 @NamedQueries(
         @NamedQuery(name = "SingleEventDataEntity.findEntitiesByType", query = "SELECT s FROM SingleEventDataEntity s " +
-                "JOIN s.payload s1 WHERE s1.type = :type ORDER BY s.name")
+                "JOIN s.payload s1 WHERE s.active = true AND s1.type = :type ORDER BY s.name")
 )
 public class SingleEventDataEntity extends PanacheEntityBase {
 
@@ -47,6 +47,7 @@ public class SingleEventDataEntity extends PanacheEntityBase {
     private String checksum;
     private String EventEndsIn;
     private String icon;
+    private boolean active;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn
@@ -56,7 +57,7 @@ public class SingleEventDataEntity extends PanacheEntityBase {
     @JoinColumn
     private SingleEventStakingEntity staking;
 
-    public static List<SingleEventDataEntity> findEntitiesByType(long type) {
+    public static List<SingleEventDataEntity> findEntitiesByTypeAndActive(long type) {
         return list("#SingleEventDataEntity.findEntitiesByType", Parameters.with("type", type));
     }
 
@@ -210,5 +211,13 @@ public class SingleEventDataEntity extends PanacheEntityBase {
 
     public void setMilestoneIndexEndDate(String milestoneIndexEndDate) {
         this.milestoneIndexEndDate = milestoneIndexEndDate;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

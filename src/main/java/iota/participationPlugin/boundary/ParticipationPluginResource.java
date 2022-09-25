@@ -1,40 +1,37 @@
 package iota.participationPlugin.boundary;
 
 import io.quarkus.panache.common.Sort;
-import iota.participationPlugin.control.ParticipationPluginBA;
 import iota.participationPlugin.control.ParticipationPluginTypeEum;
 import iota.participationPlugin.entity.SingleEventDataEntity;
 
-import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
 
 @Path("/test")
-public class  ParticipationPluginResource {
-
-    @Inject
-    ParticipationPluginBA participationPlugin;
+public class ParticipationPluginResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<SingleEventDataEntity> getAllEvents(){
+    public List<SingleEventDataEntity> getAllEvents() {
         return SingleEventDataEntity.listAll(Sort.by("name"));
     }
 
     @GET
     @Path("/staking")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<SingleEventDataEntity> getAllStakingEvents(){
-        return SingleEventDataEntity.findEntitiesByType(ParticipationPluginTypeEum.STAKING.getType());
+    public List<SingleEventDataEntity> getAllStakingEvents() {
+        return SingleEventDataEntity.findEntitiesByTypeAndActive(ParticipationPluginTypeEum.STAKING.getType());
     }
 
     @GET
     @Path("/voting")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<SingleEventDataEntity> getAllVotingEvents(){
-        return SingleEventDataEntity.findEntitiesByType(ParticipationPluginTypeEum.VOTING.getType());
+    public List<SingleEventDataEntity> getAllVotingEvents() {
+        return SingleEventDataEntity.findEntitiesByTypeAndActive(ParticipationPluginTypeEum.VOTING.getType());
     }
 /*
     @POST
